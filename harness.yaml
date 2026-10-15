@@ -1,0 +1,94 @@
+# Agentic SDLC harness contract for this repository. Read by the orchestrating Devin session and every stage
+# subagent (child session). Human-readable companion: docs/HARNESS_CONTRACT.md.
+version: 1
+repo:
+  slug: substation-asset-manager-angular-migration-demo
+  default_branch: main
+  requirement_root: requirements/customer
+  standards:
+    - standards/CODING_STANDARD.md
+    - standards/INTERFACE_CONTRACT_STANDARD.md
+    - standards/UI_MIGRATION_GUIDELINES.md
+
+ids:
+  requirement: "REQ-<FEATURE>-nnn"        # e.g. REQ-SETCMP-004 ; FEATURE is an uppercase token <= 8 chars
+  design: "DES-<FEATURE>-nnn"
+  test: "TST-<FEATURE>-nnn"
+  trace_file: docs/trace/<FEATURE>.md     # requirement -> design -> code -> test matrix, regenerated each stage
+
+stages:
+  - name: specify
+    input: requirements/customer/*.md
+    output: specs/<FEATURE>/SPEC.md       # numbered REQ ids, every gap/contradiction listed under "Open questions"
+    gate: human                           # approval required before decompose
+  - name: decompose
+    output: specs/<FEATURE>/WORK_ITEMS.md # ordered, each item cites REQ ids and the gauntlet scenario it must keep green
+    gate: none
+  - name: design
+    output: specs/<FEATURE>/DESIGN.md     # DES ids, sequence of hybrid bootstrap, service extraction, parity tests
+    gate: human
+  - name: architect
+    output: specs/<FEATURE>/ADR-*.md      # one ADR per irreversible decision (bootstrap owner, router, locale source)
+    gate: human
+  - name: coding
+    branch: "devin/<FEATURE>/<work-item>"
+    pr: draft                             # never ready-for-review by an agent
+    labels: [ai-generated]
+    gate: none
+  - name: qa
+    runs: [frontend:lint, frontend:test, backend:test, checks, ui]
+    gate: none
+  - name: integrate
+    requires: [ci_green, review_approvals]
+    gate: human                           # a human merges; agents never merge
+  - name: document
+    output: [docs/ARCHITECTURE.md, specs/<FEATURE>/CHANGELOG.md]
+    gate: none
+  - name: trace
+    output: docs/trace/<FEATURE>.md
+    gate: human                           # final acceptance
+
+commands:
+  frontend:install: "cd frontend && npm ci"
+  frontend:lint:    "cd frontend && npm run lint"
+  frontend:test:    "cd frontend && npm test"
+  backend:test:     "cd backend && mvn -q -B test"
+  backend:run:      "cd backend && mvn -q spring-boot:run"
+  frontend:run:     "cd frontend && npm start"
+  checks:           "python3 tools/checks/run_all.py --base origin/main"
+  ui:install:       "cd tests/ui && npm ci && npx playwright install --with-deps chromium"
+  ui:               "cd tests/ui && npx playwright test"
+  stack:up:         "docker compose up --build -d"
+
+review:
+  draft_only: true
+  required_label: ai-generated
+  two_reviewer_paths:
+    - backend/src/main/java/com/meridian/sam/auth/**
+    - backend/src/main/java/com/meridian/sam/audit/**
+    - backend/src/main/resources/db/migration/**
+  commit_trailers:
+    - "Refs: REQ-<FEATURE>-nnn"
+    - "Stage: <specify|decompose|design|architect|coding|qa|integrate|document|trace>"
+    - "Reviewed-by-agent: <session-url>"
+
+failure_modes:                            # deterministic checks in tools/checks; baseline in tools/checks/baseline.json
+  - id: FM-01
+    name: controller-business-logic
+    check: tools/checks/check_controller_logic.py
+    policy: ratchet                       # count may not increase vs baseline; the pilot is expected to lower it
+  - id: FM-02
+    name: removed-error-handling
+    check: tools/checks/check_error_handling.py
+    policy: diff                          # fails if the diff removes try/catch/.catch/error handlers without a PR justification line
+  - id: FM-03
+    name: null-coercion
+    check: tools/checks/check_null_coercion.py
+    policy: ratchet
+
+ui_gauntlet:
+  path: tests/ui
+  plan: tests/ui/UI_TEST_PLAN.md
+  mandatory_on: push
+  min_scenarios: 5
+  live_finale: true                       # the demo ends with Devin click-testing the running app in a browser
