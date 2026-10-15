@@ -1,0 +1,8 @@
+{
+  "name": "sam-ui-gauntlet",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Mandatory Playwright gauntlet for the Substation Asset Manager (runs against :3000 + :8080)",
+  "scripts": { "test": "playwright test", "test:headed": "playwright test --headed", "report": "playwright show-report" },
+  "devDependencies": { "@playwright/test": "1.47.2", "@types/node": "20.14.10" }
+}

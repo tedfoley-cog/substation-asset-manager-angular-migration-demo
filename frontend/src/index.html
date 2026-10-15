@@ -23,7 +23,9 @@
     </nav>
     <div class="session" data-test="session">
       <label class="session-label">Signed in as</label>
-      <select ng-model="session.username" ng-options="u.username as (u.displayName + ' · ' + u.role) for u in users | filter:{active:true}" ng-change="switchUser(session.username)" data-test="user-switcher"></select>
+      <select ng-model="session.username" ng-change="switchUser(session.username)" data-test="user-switcher">
+        <option ng-repeat="u in users | filter:{active:true}" value="{{u.username}}" ng-selected="u.username === session.username">{{u.displayName}} · {{u.role | roleLabel}}</option>
+      </select>
       <span class="role-badge role-{{currentUser.role}}" data-test="current-role">{{ currentUser.role | roleLabel }}</span>
     </div>
   </header>

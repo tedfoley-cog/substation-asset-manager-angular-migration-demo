@@ -78,4 +78,4 @@ table.grid td.num, table.grid th.num { text-align: right; font-variant-numeric: 
 .muted { color: var(--muted); } .small { font-size: 12px; } .right { text-align: right; } .nowrap { white-space: nowrap; } .mt { margin-top: 12px; } .mb0 { margin-bottom: 0; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--navy); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.ng-enter, .ng-leave { transition: opacity .18s ease; } .ng-enter, .ng-leave.ng-leave-active { opacity: 0; } .ng-enter.ng-enter-active { opacity: 1; }
+.toast.ng-enter, .toast.ng-leave { transition: opacity .18s ease; } .toast.ng-enter, .toast.ng-leave.ng-leave-active { opacity: 0; } .toast.ng-enter.ng-enter-active { opacity: 1; }

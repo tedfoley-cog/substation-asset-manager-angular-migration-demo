@@ -25,7 +25,9 @@
           var thead = table.querySelector('thead');
           if (!thead) { return; }
           shadow.empty();
-          shadow.append(angular.element(thead.cloneNode(true)));
+          var cloned = thead.cloneNode(true);
+          angular.forEach(cloned.querySelectorAll('[data-test]'), function (el) { el.removeAttribute('data-test'); });
+          shadow.append(angular.element(cloned));
           syncWidths();
         }
         function onScroll() {

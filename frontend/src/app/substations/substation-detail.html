@@ -4,7 +4,7 @@
   <div class="page-header">
     <div>
       <h1><code>{{substation.code}}</code> {{substation.name}}</h1>
-      <p class="subtitle">{{substation.region}} · {{substation.nominalKv | samNumber}} kV · operated by {{substation.operator}} · commissioned {{substation.commissionedOn | samDate:'date'}}</p>
+      <p class="subtitle">{{substation.region}} · {{substation.nominalKv | samNumber}} kV · commissioned {{substation.commissionedOn | samDate:'date'}}</p>
     </div>
     <a class="btn" ui-sref="ieds({substationId: substation.id})" data-test="all-ieds">All IEDs at this site</a>
   </div>

@@ -80,11 +80,11 @@
         return { rows: rows, summary: summary };
       }
 
-      function load() {
+      function load(override) {
         $scope.loading = true;
         ApiClient.settingsHistory(iedId).then(function (history) {
           $scope.history = history;
-          var leftId = $stateParams.left, rightId = $stateParams.right;
+          var leftId = override ? override.left : $stateParams.left, rightId = override ? override.right : $stateParams.right;
           if (!rightId) { var active = history.filter(function (h) { return h.status === 'ACTIVE'; })[0] || history[0]; rightId = active && active.id; }
           if (!leftId) { var prev = history.filter(function (h) { return h.id !== Number(rightId) && h.versionNo < (history.filter(function (x) { return x.id === Number(rightId); })[0] || {}).versionNo; })[0]; leftId = prev && prev.id; }
           $scope.selection = { left: leftId ? Number(leftId) : null, right: rightId ? Number(rightId) : null };
@@ -99,7 +99,7 @@
         }).finally(function () { $scope.loading = false; });
       }
 
-      $scope.reselect = function () { $state.go('.', { left: $scope.selection.left, right: $scope.selection.right }, { notify: false }); load(); };
+      $scope.reselect = function () { $state.go('.', { left: $scope.selection.left, right: $scope.selection.right }); load({ left: $scope.selection.left, right: $scope.selection.right }); };
       $scope.swap = function () { var l = $scope.selection.left; $scope.selection.left = $scope.selection.right; $scope.selection.right = l; $scope.reselect(); };
       $scope.visibleRows = function () {
         return $scope.rows.filter(function (r) { return ($scope.showUnchanged || r.kind !== 'unchanged') && (!$scope.groupFilter || r.settingGroup === $scope.groupFilter); });
