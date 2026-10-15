@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sam">
+<head>
+  <meta charset="utf-8">
+  <title>Substation Asset Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles/app.css">
+</head>
+<body ng-controller="ShellController" ng-class="{'drawer-open': drawerOpen}">
+  <header class="topbar">
+    <a class="brand" ui-sref="substations" data-test="brand">
+      <span class="brand-mark">SAM</span>
+      <span class="brand-title">Substation Asset Manager</span>
+      <span class="brand-version">v4.11.2</span>
+    </a>
+    <nav class="topnav" data-test="topnav">
+      <a ui-sref="substations" ui-sref-active="active" data-test="nav-substations">Substations</a>
+      <a ui-sref="ieds" ui-sref-active="active" data-test="nav-ieds">IEDs</a>
+      <a ui-sref="sclImport" ui-sref-active="active" data-test="nav-scl">SCL Import</a>
+      <a ui-sref="records" ui-sref-active="active" data-test="nav-records">Disturbance Records</a>
+      <a ui-sref="audit" ui-sref-active="active" ng-if="can('audit:read')" data-test="nav-audit">Audit Trail</a>
+    </nav>
+    <div class="session" data-test="session">
+      <label class="session-label">Signed in as</label>
+      <select ng-model="session.username" ng-options="u.username as (u.displayName + ' · ' + u.role) for u in users | filter:{active:true}" ng-change="switchUser(session.username)" data-test="user-switcher"></select>
+      <span class="role-badge role-{{currentUser.role}}" data-test="current-role">{{ currentUser.role | roleLabel }}</span>
+    </div>
+  </header>
+
+  <div class="toasts" data-test="toasts">
+    <div class="toast toast-{{t.level}}" ng-repeat="t in toasts track by t.id" ng-click="dismissToast(t)" data-test="toast">
+      <strong ng-bind="t.title"></strong> <span ng-bind="t.message"></span>
+    </div>
+  </div>
+
+  <main class="content" ui-view></main>
+
+  <footer class="footer">
+    <span>Asset service: <span ng-bind="apiStatus.text" ng-class="apiStatus.cls" data-test="api-status"></span></span>
+    <span>Locale <code ng-bind="currentUser.locale"></code></span>
+    <span>&copy; Meridian Grid Services · Protection &amp; Control Engineering</span>
+  </footer>
+
+  <script src="vendor/angular/angular.js"></script>
+  <script src="vendor/angular-animate/angular-animate.js"></script>
+  <script src="vendor/angular-sanitize/angular-sanitize.js"></script>
+  <script src="vendor/@uirouter/angularjs/release/angular-ui-router.js"></script>
+
+  <script src="app/app.module.js"></script>
+  <script src="app/app.config.js"></script>
+  <script src="app/app.routes.js"></script>
+  <script src="app/core/event-bus.service.js"></script>
+  <script src="app/core/api-client.service.js"></script>
+  <script src="app/core/session.service.js"></script>
+  <script src="app/core/locale.filters.js"></script>
+  <script src="app/core/sticky-header.directive.js"></script>
+  <script src="app/core/file-select.directive.js"></script>
+  <script src="app/shell/shell.controller.js"></script>
+  <script src="app/substations/substations.controller.js"></script>
+  <script src="app/substations/substation-detail.controller.js"></script>
+  <script src="app/ieds/ied-list.controller.js"></script>
+  <script src="app/ieds/ied-detail.controller.js"></script>
+  <script src="app/ieds/firmware-badge.component.js"></script>
+  <script src="app/settings/settings-compare.controller.js"></script>
+  <script src="app/scl/scl-import.controller.js"></script>
+  <script src="app/records/records.controller.js"></script>
+  <script src="app/audit/audit.controller.js"></script>
+</body>
+</html>

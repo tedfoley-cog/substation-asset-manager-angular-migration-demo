@@ -1,0 +1,32 @@
+<div class="breadcrumb"><a ui-sref="substations">Substations</a> / {{substation.code}}</div>
+<div class="alert alert-error" ng-if="notFound">Substation not found.</div>
+<div ng-if="substation">
+  <div class="page-header">
+    <div>
+      <h1><code>{{substation.code}}</code> {{substation.name}}</h1>
+      <p class="subtitle">{{substation.region}} · {{substation.nominalKv | samNumber}} kV · operated by {{substation.operator}} · commissioned {{substation.commissionedOn | samDate:'date'}}</p>
+    </div>
+    <a class="btn" ui-sref="ieds({substationId: substation.id})" data-test="all-ieds">All IEDs at this site</a>
+  </div>
+  <div class="card" ng-repeat="bay in bays" data-test="bay-card" data-bay="{{bay.name}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="mb0">{{bay.name}} <span class="badge badge-muted">{{bay.bayType | enumLabel}}</span></h2>
+      <span class="muted small">{{bay.nominalKv | samNumber}} kV · {{bay.iedCount}} IED(s)</span>
+    </div>
+    <p class="muted small" ng-if="bay.description">{{bay.description}}</p>
+    <table class="grid" ng-if="iedsByBay[bay.id].length">
+      <thead><tr><th>IED</th><th>Type</th><th>Model</th><th>Firmware</th><th>Status</th><th>IP</th></tr></thead>
+      <tbody>
+        <tr class="clickable" ng-repeat="ied in iedsByBay[bay.id]" ng-click="openIed(ied)" data-test="bay-ied-row">
+          <td><a ui-sref="iedDetail({id: ied.id})">{{ied.name}}</a></td>
+          <td>{{ied.deviceType | enumLabel}}</td>
+          <td>{{ied.model}}</td>
+          <td><firmware-badge firmware="ied.firmware"></firmware-badge></td>
+          <td><span class="badge badge-{{ied.status}}">{{ied.status | enumLabel}}</span></td>
+          <td class="mono">{{ied.ipAddress || '—'}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="empty" ng-if="!iedsByBay[bay.id].length">No IEDs registered in this bay.</div>
+  </div>
+</div>

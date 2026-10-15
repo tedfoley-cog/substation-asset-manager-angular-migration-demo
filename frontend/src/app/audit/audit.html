@@ -1,0 +1,38 @@
+<div class="page-header">
+  <div>
+    <h1>Audit Trail</h1>
+    <p class="subtitle">Append-only record of every settings, firmware, import and download action, including denied attempts.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="label">Events</div><div class="value" data-test="audit-count">{{events.length}}</div></div>
+    <div class="stat"><div class="label">Denied</div><div class="value" ng-class="{'status-down': countOutcome('DENIED')}" data-test="audit-denied">{{countOutcome('DENIED')}}</div></div>
+    <div class="stat"><div class="label">Failures</div><div class="value">{{countOutcome('FAILURE')}}</div></div>
+  </div>
+</div>
+<div class="alert alert-error" ng-if="forbidden" data-test="audit-forbidden">Your role cannot read the audit trail. Only Protection Admins and Auditors have <code>audit:read</code>.</div>
+<div class="toolbar" ng-if="!forbidden">
+  <label class="field">Actor
+    <select ng-model="filters.actor" ng-change="apply()" data-test="audit-filter-actor"><option value="">Anyone</option><option ng-repeat="u in users" value="{{u.username}}">{{u.displayName}} ({{u.username}})</option></select>
+  </label>
+  <label class="field">Action
+    <select ng-model="filters.action" ng-change="apply()" data-test="audit-filter-action"><option value="">All actions</option><option ng-repeat="a in actions" value="{{a}}">{{a}}</option></select>
+  </label>
+  <label class="field">Entity type
+    <select ng-model="filters.entityType" ng-change="apply()" data-test="audit-filter-entity"><option value="">All</option><option ng-repeat="t in entityTypes" value="{{t}}">{{t | enumLabel}}</option></select>
+  </label>
+  <button class="btn" ng-click="reset()">Reset</button>
+</div>
+<table class="grid" sam-sticky-header ng-if="events.length" data-test="audit-table">
+  <thead><tr><th>When (UTC)</th><th>Actor</th><th>Action</th><th>Entity</th><th>Outcome</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr ng-repeat="e in events" class="clickable" ng-click="toggle(e)" data-test="audit-row" data-action="{{e.action}}" data-outcome="{{e.outcome}}">
+      <td class="nowrap">{{e.occurredAt | samDate:'seconds'}}</td>
+      <td>{{e.actor}} <span class="muted small" ng-if="e.actorRole">· {{e.actorRole | roleLabel}}</span></td>
+      <td class="mono">{{e.action}}</td>
+      <td>{{e.entityType | enumLabel}} <span class="muted" ng-if="e.entityRef">· {{e.entityRef}}</span></td>
+      <td><span class="badge badge-{{e.outcome}}">{{e.outcome | enumLabel}}</span></td>
+      <td class="small" ng-class="{nowrap: expanded !== e.id}" style="max-width:520px;overflow:hidden;text-overflow:ellipsis">{{e.details}}<div class="muted mono" ng-if="expanded === e.id && e.clientAddress">from {{e.clientAddress}}</div></td>
+    </tr>
+  </tbody>
+</table>
+<div class="empty" ng-if="!loading && !forbidden && !events.length">No audit events for these filters.</div>

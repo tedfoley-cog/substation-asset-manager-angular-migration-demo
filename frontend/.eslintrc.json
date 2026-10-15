@@ -1,0 +1,94 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jasmine": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "plugins": [
+    "angular"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:angular/johnpapa"
+  ],
+  "globals": {
+    "angular": "readonly",
+    "inject": "readonly",
+    "module": "readonly",
+    "require": "readonly",
+    "process": "readonly",
+    "__dirname": "readonly",
+    "console": "readonly"
+  },
+  "rules": {
+    "angular/controller-as": "off",
+    "angular/no-run-logic": "off",
+    "angular/on-watch": "off",
+    "angular/document-service": "off",
+    "angular/window-service": "off",
+    "angular/timeout-service": "off",
+    "angular/controller-as-vm": "off",
+    "angular/di": [
+      "error",
+      "array"
+    ],
+    "angular/file-name": "off",
+    "angular/function-type": "off",
+    "angular/no-service-method": "off",
+    "no-console": "off",
+    "angular/controller-as-route": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "server/**/*.js",
+        "karma.conf.js",
+        "protractor.conf.js"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      },
+      "parserOptions": {
+        "ecmaVersion": 2020
+      },
+      "plugins": [],
+      "extends": [
+        "eslint:recommended"
+      ]
+    },
+    {
+      "files": [
+        "test/unit/**/*.js"
+      ],
+      "env": {
+        "jasmine": true
+      },
+      "rules": {
+        "angular/di": "off"
+      }
+    },
+    {
+      "files": [
+        "test/e2e/**/*.js"
+      ],
+      "env": {
+        "node": true,
+        "jasmine": true
+      },
+      "globals": {
+        "browser": "readonly",
+        "element": "readonly",
+        "by": "readonly"
+      },
+      "plugins": [],
+      "extends": [
+        "eslint:recommended"
+      ]
+    }
+  ]
+}

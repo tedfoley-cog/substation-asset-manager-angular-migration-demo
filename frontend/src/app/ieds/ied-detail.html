@@ -1,0 +1,162 @@
+<div class="breadcrumb"><a ui-sref="substations">Substations</a> / <a ui-sref="substationDetail({id: ied.substationId})">{{ied.substationCode}}</a> / <a ui-sref="ieds">IEDs</a> / {{ied.name}}</div>
+<div class="alert alert-error" ng-if="notFound">IED not found.</div>
+<div ng-if="ied">
+  <div class="page-header">
+    <div>
+      <h1>{{ied.name}} <span class="badge badge-{{ied.status}}" data-test="ied-status">{{ied.status | enumLabel}}</span></h1>
+      <p class="subtitle">{{ied.deviceType | enumLabel}} · {{ied.model}} · {{ied.substationName}} / {{ied.bayName}}</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" ng-click="openStatusModal()" ng-disabled="!can('ied:status')" title="{{can('ied:status') ? '' : 'Requires Protection Engineer or Admin'}}" data-test="change-status">Change status</button>
+      <button class="btn btn-primary" ng-click="openFirmwareModal()" ng-disabled="!can('firmware:assign')" title="{{can('firmware:assign') ? '' : 'Requires Protection Admin'}}" data-test="assign-firmware">Assign firmware</button>
+    </div>
+  </div>
+
+  <nav class="tabs" data-test="ied-tabs">
+    <a ng-click="setTab('overview')" ng-class="{active: tab === 'overview'}" data-test="tab-overview">Overview</a>
+    <a ng-click="setTab('settings')" ng-class="{active: tab === 'settings'}" data-test="tab-settings">Settings <span class="muted">({{history.length}})</span></a>
+    <a ng-click="setTab('records')" ng-class="{active: tab === 'records'}" data-test="tab-records">Disturbance records <span class="muted">({{records.length}})</span></a>
+  </nav>
+
+  <div ng-if="tab === 'overview'" class="card" data-test="overview-panel">
+    <dl class="kv">
+      <dt>Platform</dt><dd>{{ied.platform}}</dd>
+      <dt>Model / order code</dt><dd>{{ied.model}} <span class="muted mono">{{ied.manufacturerRef}}</span></dd>
+      <dt>Serial number</dt><dd class="mono">{{ied.serialNumber}}</dd>
+      <dt>Firmware</dt><dd><firmware-badge firmware="ied.firmware"></firmware-badge> <span class="muted small" ng-if="ied.firmware">released {{ied.firmware.releasedOn | samDate:'date'}}</span></dd>
+      <dt>Release notes</dt><dd class="small">{{ied.firmware.releaseNotes || '—'}}</dd>
+      <dt>Network</dt><dd class="mono">{{ied.ipAddress || '—'}} <span class="muted">· SCL IED name</span> {{ied.sclIedName || '—'}}</dd>
+      <dt>Installed</dt><dd>{{ied.installedOn | samDate:'date'}}</dd>
+      <dt>Last seen</dt><dd>{{ied.lastSeenAt | samDate:'seconds'}}</dd>
+      <dt>Active settings</dt><dd>{{ied.activeSettingsVersion ? 'v' + ied.activeSettingsVersion : 'none'}}</dd>
+      <dt>Notes</dt><dd>{{ied.notes || '—'}}</dd>
+    </dl>
+  </div>
+
+  <div ng-if="tab === 'settings'" data-test="settings-panel">
+    <div class="toolbar">
+      <label class="field">Baseline (left)
+        <select ng-model="compare.left" ng-options="h.id as versionLabel(h) for h in history" data-test="compare-left"><option value="">— none —</option></select>
+      </label>
+      <label class="field">Candidate (right)
+        <select ng-model="compare.right" ng-options="h.id as versionLabel(h) for h in history" data-test="compare-right"></select>
+      </label>
+      <button class="btn btn-primary" ng-click="goCompare()" ng-disabled="!compare.left || !compare.right || compare.left === compare.right" data-test="compare-go">Compare versions</button>
+      <span style="flex:1"></span>
+      <button class="btn" ng-click="openUpload()" ng-disabled="!can('settings:upload')" title="{{can('settings:upload') ? '' : 'Requires Protection Engineer or Admin'}}" data-test="upload-settings">Upload new settings…</button>
+    </div>
+
+    <div class="card" ng-if="upload.open" data-test="upload-form">
+      <h2>New settings file for {{ied.name}} <span class="muted small" ng-if="upload.sourceVersion">(pre-filled from v{{upload.sourceVersion}})</span></h2>
+      <div class="alert alert-error" ng-if="upload.errors.length" data-test="upload-errors">
+        <strong>{{upload.errors[0]}}</strong>
+        <ul ng-if="upload.errors.length > 1"><li ng-repeat="e in upload.errors.slice(1) track by $index">{{e}}</li></ul>
+      </div>
+      <form name="uploadForm" novalidate ng-submit="submitUpload(uploadForm)">
+        <div class="toolbar">
+          <label class="field" style="flex:1">Change comment
+            <input type="text" name="comment" ng-model="upload.comment" required minlength="8" placeholder="e.g. Retuned after fault study FS-2024-07" data-test="upload-comment">
+            <span class="field-error" ng-if="uploadForm.comment.$touched && uploadForm.comment.$invalid">Comment of at least 8 characters is required.</span>
+          </label>
+          <label class="field">Save as
+            <select ng-model="upload.draft" ng-options="o.v as o.l for o in [{v:false,l:'Active (supersedes current)'},{v:true,l:'Draft'}]" data-test="upload-draft"></select>
+          </label>
+        </div>
+        <table class="grid">
+          <thead><tr><th>Group</th><th>LN</th><th>Setting</th><th>Value</th><th>Unit</th><th class="num">Min</th><th class="num">Max</th><th></th></tr></thead>
+          <tbody>
+            <tr ng-repeat="row in upload.rows" ng-class="{'diff-row-violation': rowOutOfRange(row)}" data-test="upload-row" data-setting="{{row.name}}">
+              <td><input type="text" ng-model="row.settingGroup" required style="width:80px"></td>
+              <td><input type="text" ng-model="row.lnClass" required style="width:60px" class="mono"></td>
+              <td><input type="text" ng-model="row.name" required style="width:170px"></td>
+              <td><input type="text" ng-model="row.value" name="value{{$index}}" required class="mono" style="width:90px" data-test="upload-value"></td>
+              <td><input type="text" ng-model="row.unit" style="width:60px"></td>
+              <td class="num mono">{{row.minValue | samNumber}}</td>
+              <td class="num mono">{{row.maxValue | samNumber}}</td>
+              <td><button type="button" class="btn btn-link btn-sm" ng-click="removeRow(row)">remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mt" style="display:flex;gap:8px">
+          <button type="button" class="btn" ng-click="addRow()">Add setting</button>
+          <span style="flex:1"></span>
+          <button type="button" class="btn" ng-click="upload.open = false">Cancel</button>
+          <button type="submit" class="btn btn-primary" ng-disabled="upload.busy" data-test="upload-submit">Upload v{{history[0].versionNo + 1}}</button>
+        </div>
+      </form>
+    </div>
+
+    <table class="grid" data-test="settings-history">
+      <thead><tr><th>Version</th><th>File</th><th>Status</th><th>Uploaded by</th><th>Uploaded</th><th>Comment</th><th>SHA-256</th></tr></thead>
+      <tbody>
+        <tr ng-repeat="h in history" data-test="settings-version" data-version="{{h.versionNo}}">
+          <td><strong>v{{h.versionNo}}</strong></td>
+          <td class="mono">{{h.filename}}</td>
+          <td><span class="badge badge-{{h.status}}">{{h.status | enumLabel}}</span></td>
+          <td>{{h.uploadedBy}}</td>
+          <td class="nowrap">{{h.uploadedAt | samDate}}</td>
+          <td>{{h.comment}}</td>
+          <td class="mono small">{{h.checksumSha256.substring(0, 12)}}…</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div ng-if="tab === 'records'" data-test="records-panel">
+    <div class="empty" ng-if="!records.length">No disturbance records retrieved from this IED.</div>
+    <table class="grid" ng-if="records.length">
+      <thead><tr><th>Record</th><th>Triggered</th><th>Trigger</th><th>Fault</th><th class="num">Duration</th><th>Channels</th><th>Downloaded</th></tr></thead>
+      <tbody>
+        <tr ng-repeat="r in records">
+          <td class="mono">{{r.recordId}}</td>
+          <td class="nowrap">{{r.triggeredAt | samDate:'seconds'}}</td>
+          <td>{{r.triggerSource}}</td>
+          <td>{{r.faultType || '—'}} <span class="muted" ng-if="r.faultLocationKm">@ {{r.faultLocationKm | samNumber:1}} km</span></td>
+          <td class="num">{{r.durationMs | samNumber}} ms</td>
+          <td>{{r.analogChannels}}A / {{r.digitalChannels}}D</td>
+          <td><span class="badge" ng-class="r.downloaded ? 'badge-ok' : 'badge-muted'">{{r.downloaded ? 'yes' : 'no'}}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <a class="btn mt" ui-sref="records({iedId: ied.id})">Open in records browser</a>
+  </div>
+</div>
+
+<div class="modal-backdrop" ng-if="modal" ng-click="closeModal()" data-test="modal">
+  <div class="modal" ng-click="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 ng-if="modal.kind === 'firmware'">Assign firmware — {{ied.name}}</h2>
+      <h2 ng-if="modal.kind === 'status'">Change lifecycle status — {{ied.name}}</h2>
+      <button class="btn btn-sm" ng-click="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" ng-if="modal.error" data-test="modal-error">{{modal.error}}</div>
+      <div ng-if="modal.kind === 'firmware'">
+        <p class="muted small">Platform <strong>{{ied.platform}}</strong>. Only firmware built for this platform is offered; unapproved builds require a Protection Admin and are recorded in the audit trail.</p>
+        <label class="field">Firmware version
+          <select ng-model="modal.firmwareVersionId" ng-options="f.id as (f.version + (f.approved ? ' — approved' : ' — NOT approved') + (f.endOfLife ? ' — EOL' : '')) for f in firmwareOptions" data-test="firmware-select"></select>
+        </label>
+        <div class="alert alert-warn mt" ng-if="selectedFirmware() && !selectedFirmware().approved" data-test="firmware-unapproved-warning">
+          <strong>{{selectedFirmware().version}} is not approved for service.</strong> {{selectedFirmware().releaseNotes}}
+        </div>
+        <dl class="kv mt" ng-if="selectedFirmware()">
+          <dt>Released</dt><dd>{{selectedFirmware().releasedOn | samDate:'date'}}</dd>
+          <dt>Release notes</dt><dd class="small">{{selectedFirmware().releaseNotes}}</dd>
+        </dl>
+      </div>
+      <div ng-if="modal.kind === 'status'">
+        <label class="field">New status
+          <select ng-model="modal.status" ng-options="s as (s | enumLabel) for s in statuses" data-test="status-select"></select>
+        </label>
+        <label class="field mt">Reason (recorded in audit trail)
+          <textarea ng-model="modal.reason" rows="3" data-test="status-reason"></textarea>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" ng-click="closeModal()">Cancel</button>
+      <button class="btn btn-primary" ng-if="modal.kind === 'firmware'" ng-click="confirmFirmware()" ng-disabled="modal.busy || !modal.firmwareVersionId" data-test="firmware-confirm">Assign</button>
+      <button class="btn btn-primary" ng-if="modal.kind === 'status'" ng-click="confirmStatus()" ng-disabled="modal.busy || !modal.reason" data-test="status-confirm">Apply</button>
+    </div>
+  </div>
+</div>

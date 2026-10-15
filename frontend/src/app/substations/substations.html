@@ -1,0 +1,35 @@
+<div class="page-header">
+  <div>
+    <h1>Substations</h1>
+    <p class="subtitle">Protection &amp; control asset estate by site. Select a substation to drill into its bays and IEDs.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="label">Sites</div><div class="value" data-test="stat-sites">{{substations.length}}</div></div>
+    <div class="stat"><div class="label">Bays</div><div class="value" data-test="stat-bays">{{totals.bays}}</div></div>
+    <div class="stat"><div class="label">IEDs</div><div class="value" data-test="stat-ieds">{{totals.ieds}}</div></div>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field">Region
+    <select ng-model="region" ng-change="applyRegion()" data-test="region-filter">
+      <option value="">All regions</option>
+      <option ng-repeat="r in regions" value="{{r}}">{{r}}</option>
+    </select>
+  </label>
+</div>
+<div class="empty" ng-if="!loading && !substations.length">No substations match this filter.</div>
+<div class="card-grid" data-test="substation-cards">
+  <div class="card clickable" ng-repeat="s in substations" ng-click="open(s)" data-test="substation-card" data-code="{{s.code}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="mb0"><code>{{s.code}}</code> {{s.name}}</h2>
+      <span class="badge badge-muted">{{s.nominalKv | samNumber}} kV</span>
+    </div>
+    <p class="muted small">{{s.region}} · {{s.operator}}</p>
+    <div class="stat-row">
+      <div class="stat"><div class="label">Bays</div><div class="value">{{s.bayCount}}</div></div>
+      <div class="stat"><div class="label">IEDs</div><div class="value">{{s.iedCount}}</div></div>
+      <div class="stat"><div class="label">Commissioned</div><div class="value small" style="font-size:14px">{{s.commissionedOn | samDate:'date'}}</div></div>
+    </div>
+    <div class="mt"><button class="btn btn-sm" ng-click="openIeds(s, $event)" data-test="substation-ieds-link">View IEDs</button></div>
+  </div>
+</div>

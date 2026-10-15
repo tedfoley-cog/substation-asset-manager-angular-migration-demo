@@ -1,0 +1,47 @@
+<div class="page-header">
+  <div>
+    <h1>Disturbance Records</h1>
+    <p class="subtitle">COMTRADE (IEEE C37.111 / IEC 60255-24) fault records retrieved from relays. Download marks the record as collected for the post-fault review.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="label">Records</div><div class="value" data-test="rec-count">{{records.length}}</div></div>
+    <div class="stat"><div class="label">Not yet downloaded</div><div class="value" ng-class="{'status-down': pending()}" data-test="rec-pending">{{pending()}}</div></div>
+    <div class="stat"><div class="label">Volume</div><div class="value">{{totalBytes() | samBytes}}</div></div>
+  </div>
+</div>
+<div class="toolbar" data-test="rec-filters">
+  <label class="field">Substation
+    <select ng-model="filters.substationId" ng-change="apply()" data-test="rec-filter-substation"><option value="">All</option><option ng-repeat="s in substations" value="{{s.id}}">{{s.code}}</option></select>
+  </label>
+  <label class="field">IED
+    <select ng-model="filters.iedId" ng-change="apply()" data-test="rec-filter-ied"><option value="">All</option><option ng-repeat="i in ieds | filter:(filters.substationId ? {substationId: +filters.substationId} : '')" value="{{i.id}}">{{i.name}}</option></select>
+  </label>
+  <label class="field">Downloaded
+    <select ng-model="filters.downloaded" ng-change="apply()" data-test="rec-filter-downloaded"><option value="">Any</option><option value="false">Pending</option><option value="true">Collected</option></select>
+  </label>
+  <label class="field">From <input type="date" ng-model="filters.from" ng-change="apply()" data-test="rec-filter-from"></label>
+  <label class="field">To <input type="date" ng-model="filters.to" ng-change="apply()" data-test="rec-filter-to"></label>
+  <button class="btn" ng-click="reset()">Reset</button>
+  <span class="spinner" ng-if="loading"></span>
+</div>
+<div class="empty" ng-if="!loading && !records.length" data-test="rec-empty">No disturbance records match these filters.</div>
+<table class="grid" sam-sticky-header ng-if="records.length" data-test="rec-table">
+  <thead><tr><th>Record</th><th>IED</th><th>Site</th><th>Triggered (UTC)</th><th>Trigger</th><th>Fault</th><th class="num">Duration</th><th class="num">Rate</th><th>Channels</th><th>Format</th><th class="num">Size</th><th>Collected</th><th></th></tr></thead>
+  <tbody>
+    <tr ng-repeat="r in records" data-test="rec-row" data-record="{{r.recordId}}">
+      <td class="mono">{{r.recordId}}</td>
+      <td><a ui-sref="iedDetail({id: r.iedId, tab: 'records'})">{{r.iedName}}</a></td>
+      <td>{{r.substationCode}}</td>
+      <td class="nowrap">{{r.triggeredAt | samDate:'seconds'}}</td>
+      <td>{{r.triggerSource}}</td>
+      <td>{{r.faultType || '—'}}<span class="muted" ng-if="r.faultLocationKm"> @ {{r.faultLocationKm | samNumber:1}} km</span></td>
+      <td class="num">{{r.durationMs | samNumber}} ms</td>
+      <td class="num">{{r.sampleRateHz | samNumber}} Hz</td>
+      <td>{{r.analogChannels}}A / {{r.digitalChannels}}D</td>
+      <td><span class="badge badge-muted">{{r.fileFormat | enumLabel}}</span></td>
+      <td class="num">{{r.sizeBytes | samBytes}}</td>
+      <td><span ng-if="r.downloaded" class="badge badge-ok" title="by {{r.downloadedBy}} at {{r.downloadedAt | samDate}}" data-test="rec-collected">{{r.downloadedBy}}</span><span ng-if="!r.downloaded" class="badge badge-warn">pending</span></td>
+      <td class="nowrap"><button class="btn btn-sm" ng-click="download(r)" ng-disabled="!can('records:download') || downloading[r.id]" title="{{can('records:download') ? 'Download .cfg header' : 'Requires engineer role'}}" data-test="rec-download">{{r.downloaded ? 'Re-download' : 'Download'}}</button></td>
+    </tr>
+  </tbody>
+</table>

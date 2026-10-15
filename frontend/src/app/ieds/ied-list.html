@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div>
+    <h1>IED Inventory</h1>
+    <p class="subtitle">Protection relays, bay controllers and merging units across all sites.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="label">Shown</div><div class="value" data-test="ied-count">{{ieds.length}}</div></div>
+    <div class="stat"><div class="label">In service</div><div class="value">{{countBy('IN_SERVICE')}}</div></div>
+    <div class="stat"><div class="label">Maintenance</div><div class="value">{{countBy('MAINTENANCE')}}</div></div>
+    <div class="stat"><div class="label">EOL firmware</div><div class="value" ng-class="{'status-down': eolCount()}" data-test="eol-count">{{eolCount()}}</div></div>
+  </div>
+</div>
+<div class="toolbar" data-test="ied-filters">
+  <label class="field">Search
+    <input type="search" ng-model="filters.q" ng-change="onSearch()" placeholder="name, serial, model…" data-test="ied-search">
+  </label>
+  <label class="field">Substation
+    <select ng-model="filters.substationId" ng-change="apply()" data-test="filter-substation">
+      <option value="">All</option>
+      <option ng-repeat="s in substations" value="{{s.id}}">{{s.code}} — {{s.name}}</option>
+    </select>
+  </label>
+  <label class="field">Device type
+    <select ng-model="filters.deviceType" ng-change="apply()" data-test="filter-type">
+      <option value="">All</option>
+      <option ng-repeat="t in deviceTypes" value="{{t}}">{{t | enumLabel}}</option>
+    </select>
+  </label>
+  <label class="field">Status
+    <select ng-model="filters.status" ng-change="apply()" data-test="filter-status">
+      <option value="">All</option>
+      <option ng-repeat="s in statuses" value="{{s}}">{{s | enumLabel}}</option>
+    </select>
+  </label>
+  <button class="btn" ng-click="reset()" data-test="filter-reset">Reset</button>
+  <span class="spinner" ng-if="loading"></span>
+</div>
+<div class="empty" ng-if="!loading && !ieds.length" data-test="ied-empty">No IEDs match the current filters.</div>
+<table class="grid" sam-sticky-header ng-if="ieds.length" data-test="ied-table">
+  <thead>
+    <tr>
+      <th class="sortable" ng-click="sortBy('name')" data-test="sort-name">IED <span class="sort-ind">{{sortIndicator('name')}}</span></th>
+      <th class="sortable" ng-click="sortBy('substation')">Site / bay <span class="sort-ind">{{sortIndicator('substation')}}</span></th>
+      <th class="sortable" ng-click="sortBy('deviceType')">Type <span class="sort-ind">{{sortIndicator('deviceType')}}</span></th>
+      <th>Model</th>
+      <th class="sortable" ng-click="sortBy('firmware')" data-test="sort-firmware">Firmware <span class="sort-ind">{{sortIndicator('firmware')}}</span></th>
+      <th class="sortable" ng-click="sortBy('status')">Status <span class="sort-ind">{{sortIndicator('status')}}</span></th>
+      <th>IP address</th>
+      <th class="sortable" ng-click="sortBy('lastSeenAt')">Last seen <span class="sort-ind">{{sortIndicator('lastSeenAt')}}</span></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="ied in ieds | orderBy:sortExpr:sort.desc" ng-class="{selected: selected.id === ied.id}" class="clickable" ng-click="select(ied)" data-test="ied-row" data-name="{{ied.name}}">
+      <td><strong>{{ied.name}}</strong><div class="muted small mono">{{ied.serialNumber}}</div></td>
+      <td>{{ied.substationCode}} <span class="muted">/</span> {{ied.bayName}}</td>
+      <td>{{ied.deviceType | enumLabel}}</td>
+      <td>{{ied.model}}<div class="muted small">{{ied.manufacturerRef}}</div></td>
+      <td><firmware-badge firmware="ied.firmware"></firmware-badge></td>
+      <td><span class="badge badge-{{ied.status}}">{{ied.status | enumLabel}}</span></td>
+      <td class="mono">{{ied.ipAddress || '—'}}</td>
+      <td class="nowrap">{{ied.lastSeenAt | samDate}}</td>
+      <td class="nowrap"><button class="btn btn-sm" ng-click="openDetail(ied); $event.stopPropagation()" data-test="ied-open">Open</button></td>
+    </tr>
+  </tbody>
+</table>
+
+<aside class="drawer" ng-if="selected" data-test="ied-drawer">
+  <button class="btn btn-sm drawer-close" ng-click="selected = null" data-test="drawer-close">Close</button>
+  <h2>{{selected.name}}</h2>
+  <p class="muted small">{{selected.substationName}} · {{selected.bayName}}</p>
+  <dl class="kv">
+    <dt>Device type</dt><dd>{{selected.deviceType | enumLabel}}</dd>
+    <dt>Platform</dt><dd>{{selected.platform}}</dd>
+    <dt>Model</dt><dd>{{selected.model}}</dd>
+    <dt>Serial</dt><dd class="mono">{{selected.serialNumber}}</dd>
+    <dt>Firmware</dt><dd><firmware-badge firmware="selected.firmware"></firmware-badge></dd>
+    <dt>Status</dt><dd><span class="badge badge-{{selected.status}}">{{selected.status | enumLabel}}</span></dd>
+    <dt>IP / IED name (SCL)</dt><dd class="mono">{{selected.ipAddress || '—'}} · {{selected.sclIedName || '—'}}</dd>
+    <dt>Installed</dt><dd>{{selected.installedOn | samDate:'date'}}</dd>
+    <dt>Last seen</dt><dd>{{selected.lastSeenAt | samDate:'seconds'}}</dd>
+    <dt>Settings</dt><dd>{{selected.activeSettingsVersion ? 'v' + selected.activeSettingsVersion : 'none active'}} · {{selected.settingsFileCount}} file(s)</dd>
+    <dt>Disturbance records</dt><dd>{{selected.recordCount}}</dd>
+  </dl>
+  <div class="mt" style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-primary" ng-click="openDetail(selected)" data-test="drawer-open-detail">Open IED</button>
+    <button class="btn" ng-click="openDetail(selected, 'settings')" data-test="drawer-open-settings">Settings history</button>
+    <a class="btn" ui-sref="records({iedId: selected.id})">Records</a>
+  </div>
+</aside>

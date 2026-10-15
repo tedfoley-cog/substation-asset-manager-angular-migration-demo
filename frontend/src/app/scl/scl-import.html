@@ -1,0 +1,67 @@
+<div class="page-header">
+  <div>
+    <h1>IEC 61850 SCL Import</h1>
+    <p class="subtitle">Upload engineering files (ICD, CID, SCD, SSD, IID). IEDs are matched to the inventory by IED name; communication addresses are reconciled.</p>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns: 1fr 1fr;gap:16px">
+  <div>
+    <div class="dropzone" ng-class="{busy: busy}" data-test="scl-dropzone">
+      <div ng-if="!can('scl:import')" class="muted" data-test="scl-no-permission">Your role ({{currentUser.role | roleLabel}}) cannot import SCL files. Switch to a Protection Engineer or Admin.</div>
+      <div ng-if="can('scl:import')">
+        <strong>Select an SCL file</strong>
+        <div class="muted small">Namespace <code>http://www.iec.ch/61850/2003/SCL</code> · Edition 2 (2007B) preferred · max 20 MB</div>
+        <input type="file" accept="{{accepted}}" sam-file-select="onFiles(files)" ng-disabled="busy" data-test="scl-file-input">
+        <div class="mt" ng-if="busy"><span class="spinner"></span> parsing…</div>
+      </div>
+    </div>
+    <div class="alert alert-error mt" ng-if="error" data-test="scl-error">
+      <strong>{{error.message}}</strong>
+      <ul ng-if="error.details.length"><li ng-repeat="d in error.details track by $index">{{d}}</li></ul>
+    </div>
+    <h3 class="mt">Import history</h3>
+    <table class="grid" data-test="scl-history">
+      <thead><tr><th>File</th><th>Type</th><th>Substation</th><th class="num">IEDs</th><th>Status</th><th>By</th><th>When</th></tr></thead>
+      <tbody>
+        <tr ng-repeat="i in imports" class="clickable" ng-class="{selected: selected.id === i.id}" ng-click="open(i)" data-test="scl-import-row" data-status="{{i.status}}">
+          <td class="mono">{{i.filename}}</td>
+          <td><span class="badge badge-muted">{{i.fileType}}</span></td>
+          <td>{{i.substationCode || '—'}}</td>
+          <td class="num">{{i.iedCount}}</td>
+          <td><span class="badge badge-{{i.status}}">{{i.status | enumLabel}}</span></td>
+          <td>{{i.importedBy}}</td>
+          <td class="nowrap">{{i.importedAt | samDate}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="empty" ng-if="!selected">Select an import to see the parsed IEDs and address reconciliation.</div>
+    <div class="card" ng-if="selected" data-test="scl-detail">
+      <button class="btn btn-sm" style="float:right" ng-click="close()">Close</button>
+      <h2 class="mono">{{selected.filename}}</h2>
+      <dl class="kv">
+        <dt>Status</dt><dd><span class="badge badge-{{selected.status}}" data-test="scl-detail-status">{{selected.status | enumLabel}}</span></dd>
+        <dt>Result</dt><dd data-test="scl-detail-message">{{selected.message}}</dd>
+        <dt>SCL version</dt><dd>{{selected.sclVersion || '—'}} <span class="muted small" ng-if="selected.toolId">· {{selected.toolId}}</span></dd>
+        <dt>Substation</dt><dd>{{selected.substationCode || '—'}}</dd>
+        <dt>Size</dt><dd>{{selected.sizeBytes | samBytes}}</dd>
+        <dt>Imported</dt><dd>{{selected.importedAt | samDate:'seconds'}} by {{selected.importedBy}}</dd>
+        <dt>Checksum</dt><dd class="mono small">{{selected.checksumSha256}}</dd>
+      </dl>
+      <h3 class="mt">IEDs in file <span class="muted">({{matched(selected)}} of {{selected.ieds.length}} matched)</span></h3>
+      <table class="grid" ng-if="selected.ieds.length" data-test="scl-ied-table">
+        <thead><tr><th>IED name</th><th>Type / vendor</th><th>IP</th><th>Logical nodes</th><th>Inventory match</th></tr></thead>
+        <tbody>
+          <tr ng-repeat="row in selected.ieds" ng-class="{clickable: row.matchedIedId}" ng-click="goIed(row)" data-test="scl-ied-row" data-matched="{{!!row.matchedIedId}}">
+            <td class="mono">{{row.iedName}}</td>
+            <td>{{row.iedType || '—'}}<div class="muted small">{{row.manufacturer}} {{row.configVersion ? '· cfg ' + row.configVersion : ''}}</div></td>
+            <td class="mono">{{row.ipAddress || '—'}}</td>
+            <td class="small mono">{{row.lnClasses.join(' ')}}</td>
+            <td><span class="badge" ng-class="row.matchedIedId ? 'badge-ok' : 'badge-warn'">{{row.matchedIedId ? row.matchedIedName : 'not in inventory'}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
