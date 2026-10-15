@@ -17,6 +17,8 @@ services:
         MAVEN_MIRROR: ${MAVEN_MIRROR:-https://repo.maven.apache.org/maven2}
     environment:
       SPRING_PROFILES_ACTIVE: postgres
+      # Docker's embedded DNS answers A records only; the JVM's dual-stack lookup of `db` fails without this on some hosts.
+      JAVA_TOOL_OPTIONS: -Djava.net.preferIPv4Stack=true
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sam
       SPRING_DATASOURCE_USERNAME: sam
       SPRING_DATASOURCE_PASSWORD: sam-local-only

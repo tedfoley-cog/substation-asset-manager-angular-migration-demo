@@ -3,7 +3,7 @@
 ## Start
 | What | Command | Check |
 |---|---|---|
-| Backend (H2, seeded) | `cd backend && mvn spring-boot:run` | `curl localhost:8080/api/substations` → 3 sites |
+| Backend (H2, seeded) | `cd backend && mvn spring-boot:run` | `curl localhost:8080/api/substations` → JSON list of substations |
 | Frontend | `cd frontend && npm ci && npm start` | `curl localhost:3000/` → 200; `/api/*` proxied |
 | Everything incl. PostgreSQL | `docker compose up --build` | `docker compose ps` → db/backend healthy, frontend up |
 | Backend against local PostgreSQL | `SPRING_PROFILES_ACTIVE=postgres SPRING_DATASOURCE_URL=… mvn spring-boot:run` | Flyway applies V1/V2 |
