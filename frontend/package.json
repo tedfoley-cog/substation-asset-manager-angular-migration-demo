@@ -1,0 +1,31 @@
+{
+  "name": "sam-web",
+  "version": "4.11.2",
+  "private": true,
+  "description": "Substation Asset Manager web client (AngularJS 1.8)",
+  "scripts": {
+    "start": "node server/dev-server.js",
+    "test": "karma start karma.conf.js --single-run",
+    "test:watch": "karma start karma.conf.js",
+    "lint": "eslint src test",
+    "e2e:legacy": "echo 'Protractor suite is end-of-life; see test/e2e/README.md' && exit 1"
+  },
+  "dependencies": {
+    "angular": "1.8.3",
+    "angular-animate": "1.8.3",
+    "angular-sanitize": "1.8.3",
+    "@uirouter/angularjs": "1.1.1"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.8.3",
+    "eslint": "8.57.0",
+    "eslint-plugin-angular": "4.1.0",
+    "http-proxy": "1.18.1",
+    "jasmine-core": "5.1.2",
+    "karma": "6.4.3",
+    "karma-chrome-launcher": "3.2.0",
+    "karma-jasmine": "5.1.0",
+    "karma-spec-reporter": "0.0.36"
+  },
+  "engines": { "node": ">=18" }
+}

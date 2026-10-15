@@ -1,0 +1,3 @@
+package com.meridian.sam.domain;
+
+public enum DeviceType { TRANSFORMER_DIFFERENTIAL, LINE_DISTANCE, FEEDER_PROTECTION, BAY_CONTROLLER, MERGING_UNIT }

@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: substation-asset-manager
+  profiles:
+    default: h2
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+
+sam:
+  auth:
+    header: X-SAM-User
+    default-user: ${SAM_DEFAULT_USER:}
+  records:
+    download-dir: ${SAM_RECORDS_DIR:./data/records}

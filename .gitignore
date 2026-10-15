@@ -1,0 +1,15 @@
+# Java
+backend/target/
+*.class
+*.log
+# Node
+node_modules/
+frontend/coverage/
+tests/ui/node_modules/
+tests/ui/test-results/
+tests/ui/playwright-report/
+tests/ui/screenshots/
+# Local data
+data/
+.env
+.DS_Store
