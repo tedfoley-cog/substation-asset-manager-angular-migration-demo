@@ -47,6 +47,7 @@ public class SclImportService {
             Permissions.require(user, Role::canImportScl, "import SCL files");
             SclFileType type = fileType(filename);
             SclImport imp = new SclImport(filename, type, user.username(), OffsetDateTime.now(clock), file.getSize());
+            imp.setChecksumSha256(sha256Hex(file.getBytes()));
             try (InputStream in = file.getInputStream()) {
                 SclDocument doc = parser.parse(in);
                 List<SclImportIed> parsed = new ArrayList<>();
@@ -88,6 +89,14 @@ public class SclImportService {
             return SclFileType.valueOf(ext);
         } catch (IllegalArgumentException e) {
             throw new ValidationException(List.of("Unsupported SCL file extension ." + ext.toLowerCase(Locale.ROOT) + " (expected .icd, .cid, .scd, .ssd or .iid)"));
+        }
+    }
+
+    private static String sha256Hex(byte[] bytes) {
+        try {
+            return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 unavailable", e);
         }
     }
 }

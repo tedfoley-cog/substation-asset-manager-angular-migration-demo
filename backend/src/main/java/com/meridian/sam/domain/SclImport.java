@@ -30,6 +30,9 @@ public class SclImport {
     private OffsetDateTime importedAt;
     @Column(name = "size_bytes", nullable = false)
     private long sizeBytes;
+
+    @Column(name = "checksum_sha256", length = 64)
+    private String checksumSha256;
     @OneToMany(mappedBy = "sclImport", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("iedName ASC")
     private List<SclImportIed> ieds = new ArrayList<>();
@@ -61,4 +64,7 @@ public class SclImport {
     public void fail(String message) {
         this.status = SclImportStatus.FAILED; this.message = message; this.iedCount = 0;
     }
+
+    public String getChecksumSha256() { return checksumSha256; }
+    public void setChecksumSha256(String checksumSha256) { this.checksumSha256 = checksumSha256; }
 }

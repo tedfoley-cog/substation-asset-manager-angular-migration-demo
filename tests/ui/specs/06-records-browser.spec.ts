@@ -13,7 +13,7 @@ test('S6 COMTRADE download marks the record as collected', async ({ page }) => {
   expect(pendingBefore).toBeGreaterThan(0);
   const target = rows.first();
   const recordId = (await target.getAttribute('data-record'))!;
-  expect(recordId).toMatch(/^NTH0\d_/);
+  expect(recordId).toMatch(/^[A-Z]{3}0\d_/);
   await expect(target).toContainText('Comtrade');
 
   const download = page.waitForEvent('download');

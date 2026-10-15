@@ -1,5 +1,7 @@
 package com.meridian.sam.web;
 
+import com.meridian.sam.service.IedStats;
+
 import com.meridian.sam.auth.CurrentUser;
 import com.meridian.sam.domain.*;
 import com.meridian.sam.web.dto.*;
@@ -21,13 +23,14 @@ final class DtoMapper {
         return new BayDto(b.getId(), b.getSubstation().getId(), b.getName(), b.getBayType().name(), b.getNominalKv(), b.getIeds().size());
     }
 
-    static IedDto ied(Ied i) {
+    static IedDto ied(Ied i, IedStats st) {
         Bay b = i.getBay();
         Substation s = b.getSubstation();
         return new IedDto(i.getId(), i.getName(), i.getDeviceType().name(), i.getPlatform(), i.getModel(), i.getSerialNumber(),
             i.getIpAddress(), i.getStatus().name(), i.getInstalledOn(), i.getLastSettingsUploadAt(), i.getLastSeenAt(),
             s.getId(), s.getCode(), s.getName(), b.getId(), b.getName(),
-            i.getFirmwareVersion() == null ? null : firmware(i.getFirmwareVersion()));
+            i.getFirmwareVersion() == null ? null : firmware(i.getFirmwareVersion()),
+            st.activeSettingsVersion(), st.settingsFileCount(), st.recordCount(), st.sclIedName());
     }
 
     static FirmwareDto firmware(FirmwareVersion f) {
@@ -48,7 +51,8 @@ final class DtoMapper {
     static SclImportDto sclImport(SclImport i, boolean withIeds) {
         List<SclImportIedDto> ieds = withIeds ? i.getIeds().stream().map(DtoMapper::sclImportIed).toList() : null;
         return new SclImportDto(i.getId(), i.getFilename(), i.getFileType().name(), i.getSclVersion(), i.getSubstationCode(),
-            i.getIedCount(), i.getStatus().name(), i.getMessage(), i.getImportedBy(), i.getImportedAt(), i.getSizeBytes(), ieds);
+            i.getIedCount(), i.getStatus().name(), i.getMessage(), i.getImportedBy(), i.getImportedAt(), i.getSizeBytes(),
+            i.getChecksumSha256(), ieds);
     }
 
     static SclImportIedDto sclImportIed(SclImportIed i) {

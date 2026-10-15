@@ -197,6 +197,11 @@ components:
       type: object
     IedDto:
       properties:
+        activeSettingsVersion:
+          description: versionNo of the ACTIVE settings file, null when none
+          format: int32
+          nullable: true
+          type: integer
         bayId:
           format: int64
           type: integer
@@ -237,8 +242,18 @@ components:
           type: string
         platform:
           type: string
+        recordCount:
+          format: int64
+          type: integer
+        sclIedName:
+          description: IED name from the most recent SCL import that matched this device
+          nullable: true
+          type: string
         serialNumber:
           type: string
+        settingsFileCount:
+          format: int64
+          type: integer
         status:
           enum:
           - IN_SERVICE
@@ -266,9 +281,16 @@ components:
       - substationName
       - bayId
       - bayName
+      - settingsFileCount
+      - recordCount
       type: object
     SclImportDto:
       properties:
+        checksumSha256:
+          maxLength: 64
+          minLength: 64
+          nullable: true
+          type: string
         fileType:
           enum:
           - ICD

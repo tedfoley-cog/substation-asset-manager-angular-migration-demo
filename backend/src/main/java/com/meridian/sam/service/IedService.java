@@ -6,6 +6,11 @@ import com.meridian.sam.auth.Permissions;
 import com.meridian.sam.domain.*;
 import com.meridian.sam.repository.FirmwareVersionRepository;
 import com.meridian.sam.repository.IedRepository;
+import com.meridian.sam.repository.SclImportRepository;
+import com.meridian.sam.repository.DisturbanceRecordRepository;
+import com.meridian.sam.repository.SettingsFileRepository;
+import com.meridian.sam.domain.SettingsStatus;
+import com.meridian.sam.domain.SettingsFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -15,10 +20,23 @@ import java.util.List;
 public class IedService {
     private final IedRepository ieds;
     private final FirmwareVersionRepository firmware;
+    private final SettingsFileRepository settingsFiles;
+    private final DisturbanceRecordRepository records;
+    private final SclImportRepository sclImports;
     private final AuditService audit;
 
-    public IedService(IedRepository ieds, FirmwareVersionRepository firmware, AuditService audit) {
-        this.ieds = ieds; this.firmware = firmware; this.audit = audit;
+    public IedService(IedRepository ieds, FirmwareVersionRepository firmware, SettingsFileRepository settingsFiles,
+                      DisturbanceRecordRepository records, SclImportRepository sclImports, AuditService audit) {
+        this.ieds = ieds; this.firmware = firmware; this.settingsFiles = settingsFiles; this.records = records;
+        this.sclImports = sclImports; this.audit = audit;
+    }
+
+    /** Summary figures for one IED. Issued per row (N+1) — the inventory is small today; revisit when it is not. */
+    public IedStats stats(Ied ied) {
+        Integer active = settingsFiles.findFirstByIedIdAndStatus(ied.getId(), SettingsStatus.ACTIVE).map(SettingsFile::getVersionNo).orElse(null);
+        List<String> sclNames = sclImports.matchedSclIedNames(ied.getId());
+        return new IedStats(active, settingsFiles.countByIedId(ied.getId()), records.countByIedId(ied.getId()),
+            sclNames.isEmpty() ? null : sclNames.get(0));
     }
 
     public List<Ied> search(Long substationId, DeviceType deviceType, IedStatus status, String q) {

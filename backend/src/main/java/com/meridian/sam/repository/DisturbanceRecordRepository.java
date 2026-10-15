@@ -33,4 +33,6 @@ public interface DisturbanceRecordRepository extends JpaRepository<DisturbanceRe
 
     @EntityGraph(attributePaths = {"ied", "ied.bay", "ied.bay.substation"})
     Optional<DisturbanceRecord> findWithIedById(Long id);
+
+    long countByIedId(Long iedId);
 }
