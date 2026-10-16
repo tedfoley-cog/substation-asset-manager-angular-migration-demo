@@ -24,7 +24,7 @@
             "outputHashing": "none",
             "vendorChunk": false,
             "extractLicenses": false,
-            "deleteOutputPath": true
+            "deleteOutputPath": false
           },
           "configurations": {
             "production": {
