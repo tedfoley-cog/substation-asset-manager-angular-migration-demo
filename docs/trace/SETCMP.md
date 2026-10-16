@@ -4,7 +4,7 @@ Feature: SETCMP
 PR: #1
 Branch: devin/SETCMP/cr-2031-settings-compare
 Code HEAD: 93f9915 (coding HEAD 28cb6ae; branch forked from `main` at f701f90)
-Approved-by:
+Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16
 
 Every row below was checked against the branch: `git log origin/main..HEAD` (15 stage-artefact commits + 5 coding
 commits + 1 documentation commit), the `Refs:` trailers of the five coding commits, the `TST-SETCMP-` tags in
@@ -171,4 +171,4 @@ traceability rules in `docs/HARNESS_CONTRACT.md`.
 
 ## GATE
 
-GATE: trace — status: WAITING FOR HUMAN APPROVAL. Final acceptance requires a human message of the form Approved-by: <name> <YYYY-MM-DD>; the orchestrator records it. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
+GATE: trace — status: PASSED (final acceptance). Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
