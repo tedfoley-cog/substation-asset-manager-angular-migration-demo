@@ -90,5 +90,12 @@
         "eslint:recommended"
       ]
     }
+  ],
+  "ignorePatterns": [
+    "src/vendor/**",
+    "src/ng/**",
+    "src/app-ng/**",
+    ".angular/**",
+    "test/e2e/**"
   ]
 }

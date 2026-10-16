@@ -4,28 +4,50 @@
   "private": true,
   "description": "Substation Asset Manager web client (AngularJS 1.8)",
   "scripts": {
+    "prestart": "npm run build",
     "start": "node server/dev-server.js",
+    "build": "ng build",
+    "build:dev": "ng build --configuration development",
+    "watch": "ng build --configuration development --watch",
     "test": "karma start karma.conf.js --single-run",
     "test:watch": "karma start karma.conf.js",
+    "test:ng": "ng test",
     "lint": "eslint src test",
     "e2e:legacy": "echo 'Protractor suite is end-of-life; see test/e2e/README.md' && exit 1"
   },
   "dependencies": {
+    "@angular/common": "16.2.12",
+    "@angular/compiler": "16.2.12",
+    "@angular/core": "16.2.12",
+    "@angular/platform-browser": "16.2.12",
+    "@angular/platform-browser-dynamic": "16.2.12",
+    "@angular/upgrade": "16.2.12",
     "@uirouter/angularjs": "1.1.1",
     "angular": "1.8.3",
     "angular-animate": "1.8.3",
     "angular-sanitize": "1.8.3",
-    "http-proxy": "1.18.1"
+    "http-proxy": "1.18.1",
+    "rxjs": "7.8.1",
+    "tslib": "2.6.2",
+    "zone.js": "0.13.3"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "16.2.16",
+    "@angular/cli": "16.2.16",
+    "@angular/compiler-cli": "16.2.12",
+    "@types/angular": "1.8.9",
+    "@types/jasmine": "5.1.4",
     "angular-mocks": "1.8.3",
     "eslint": "8.57.0",
     "eslint-plugin-angular": "4.1.0",
     "jasmine-core": "5.1.2",
     "karma": "6.4.3",
     "karma-chrome-launcher": "3.2.0",
+    "karma-coverage": "2.2.1",
     "karma-jasmine": "5.1.0",
-    "karma-spec-reporter": "0.0.36"
+    "karma-jasmine-html-reporter": "2.1.0",
+    "karma-spec-reporter": "0.0.36",
+    "typescript": "5.1.6"
   },
   "engines": {
     "node": ">=18"

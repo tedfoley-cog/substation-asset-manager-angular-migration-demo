@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "outDir": "./.angular/out-tsc/app", "types": ["angular"] },
+  "files": ["src/app-ng/main.ts"],
+  "include": ["src/app-ng/**/*.d.ts"],
+  "exclude": ["src/app-ng/**/*.spec.ts"]
+}
