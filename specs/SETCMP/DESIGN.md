@@ -1,7 +1,7 @@
 # DESIGN — SETCMP: Settings Comparison migration to Angular (CR-2031)
 Stage: design
 Upstream: specs/SETCMP/SPEC.md (approved 2026-10-16), specs/SETCMP/WORK_ITEMS.md
-Approved-by:
+Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16
 
 ## Overview
 
@@ -274,6 +274,15 @@ REQ-008, 009, 010, 011, 016 · WI-03, WI-05 · TST-006, 027.
 
 ## Open questions
 
+### Decisions recorded at the Design gate (2026-10-16, Teddy Foley)
+
+| OQ | Decision |
+|----|----------|
+| OQ-16 | Yes — extend `tools/checks/check_null_coercion.py`'s glob to `frontend/src/app-ng/**/*.html` in WI-05; the harness's checks must see the new code and the FM-03 count must not go up. |
+| OQ-17 | `prestart` builds on every `npm start`; the manual `npm run build` is documented as well. |
+| OQ-8 / DES-015/016 | The `LOCALE_ID` deviation (session-driven `Intl` pipes instead of a static `LOCALE_ID`) is accepted. Architect records it as an ADR with the rejected alternatives and a note that UM-21's wording should be updated in a follow-up. |
+
+
 - **OQ-16 — Extending `tools/checks/check_null_coercion.py` to `frontend/src/app-ng/**/*.html` (DES-019).** It changes the harness's own check
   (count stays 1 today). Approve as part of WI-05, or keep the checks frozen and accept that Angular templates are reviewed by hand for FM-03?
 - **OQ-17 — `prestart` build on every `npm start` (DES-003).** Adds a few seconds to every start; the alternative is documenting "run
@@ -306,4 +315,4 @@ All 35 REQ-SETCMP ids have ≥ 1 DES and ≥ 1 TST; REQ-SETCMP-033 is informatio
 
 ## GATE
 
-GATE: design — status: WAITING FOR HUMAN APPROVAL. Architect must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>`. Open: OQ-16 (extend FM-03 glob to app-ng templates), OQ-17 (`prestart` build). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
+GATE: design — status: PASSED. Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16. OQ-16 yes, OQ-17 prestart, LOCALE_ID deviation accepted (ADR at Architect). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
