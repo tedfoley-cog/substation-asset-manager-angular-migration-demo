@@ -222,3 +222,7 @@ renumbered; a REQ overtaken by an open-question decision (e.g. REQ-SETCMP-022 if
 `withdrawn` with the OQ as reason and a new ID is issued. The ADRs the Architect stage must produce for this feature
 are: bootstrap owner (REQ-SETCMP-001), routing during hybrid (REQ-SETCMP-002), locale source (REQ-SETCMP-019 / OQ-8),
 and where comparison logic lives (REQ-SETCMP-020/022 / OQ-1).
+
+## GATE
+
+GATE: specify — status: WAITING FOR HUMAN APPROVAL. Decompose must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>`. Open questions OQ-1…OQ-11 are unanswered; answers given with the approval are applied to the REQs they block before Decompose. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
