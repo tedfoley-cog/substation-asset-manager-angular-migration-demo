@@ -303,3 +303,7 @@ REQ-008, 009, 010, 011, 016 · WI-03, WI-05 · TST-006, 027.
 | 018 | 007, 010, 011 | 010, 019, 027 | | | | |
 
 All 35 REQ-SETCMP ids have ≥ 1 DES and ≥ 1 TST; REQ-SETCMP-033 is informational per the Specify-gate decision on OQ-4.
+
+## GATE
+
+GATE: design — status: WAITING FOR HUMAN APPROVAL. Architect must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>`. Open: OQ-16 (extend FM-03 glob to app-ng templates), OQ-17 (`prestart` build). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
