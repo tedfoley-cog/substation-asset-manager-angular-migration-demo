@@ -42,6 +42,8 @@ table.grid th { background: #eef2f5; font-size: 12px; text-transform: uppercase;
 table.grid th.sortable { cursor: pointer; } table.grid th.sortable:hover { color: var(--ink); } table.grid th .sort-ind { font-size: 10px; margin-left: 4px; }
 table.grid tbody tr:hover { background: #f7f9fb; } table.grid tr.selected { background: #fff7e6; } table.grid tr.clickable { cursor: pointer; }
 table.grid td.num, table.grid th.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Settings comparison (Angular): header sticks below the 56 px top bar by CSS instead of the samStickyHeader clone (DES-SETCMP-020). */
+table.grid.compare-grid { overflow: visible; } table.grid.compare-grid thead th { position: sticky; top: 56px; z-index: 10; }
 .sticky-shadow { display: none; position: fixed; top: 56px; z-index: 20; border-collapse: collapse; background: #eef2f5; box-shadow: 0 2px 4px rgba(0,0,0,.15); }
 .sticky-shadow--visible { display: table; } .sticky-shadow th { padding: 8px 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); text-align: left; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; letter-spacing: .03em; white-space: nowrap; }

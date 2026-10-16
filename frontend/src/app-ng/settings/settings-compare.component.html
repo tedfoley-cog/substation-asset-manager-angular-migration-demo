@@ -1,0 +1,51 @@
+<!-- 1:1 transcription of the legacy app/settings/settings-compare.html (DES-SETCMP-011): same element order, texts and hooks. -->
+<div class="breadcrumb"><a [href]="iedsHref()">IEDs</a> / <a [href]="breadcrumbHref()">{{iedName}}</a> / Compare settings</div>
+<div class="page-header">
+  <div>
+    <h1>Settings comparison — {{iedName}}</h1>
+    <p class="subtitle">Baseline <strong *ngIf="left">v{{left.versionNo}}</strong><span *ngIf="!left">none</span> → candidate <strong *ngIf="right">v{{right.versionNo}}</strong>. Rows ordered by protection impact; range violations first.</p>
+  </div>
+  <div class="stat-row" data-test="compare-summary">
+    <div class="stat"><div class="label">Changed</div><div class="value" data-test="sum-changed">{{summary.changed}}</div></div>
+    <div class="stat"><div class="label">Added</div><div class="value" data-test="sum-added">{{summary.added}}</div></div>
+    <div class="stat"><div class="label">Removed</div><div class="value" data-test="sum-removed">{{summary.removed}}</div></div>
+    <div class="stat"><div class="label">Range violations</div><div class="value" [class.status-down]="summary.violations > 0" data-test="sum-violations">{{summary.violations}}</div></div>
+    <div class="stat"><div class="label">Unchanged</div><div class="value muted">{{summary.unchanged}}</div></div>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field">Baseline
+    <select [ngModel]="selection.left" (ngModelChange)="selection.left = $event; reselect()" data-test="compare-left"><option [ngValue]="null">— none —</option><option *ngFor="let h of history" [ngValue]="h.id">{{versionLabel(h)}}</option></select>
+  </label>
+  <button class="btn" (click)="swap()" title="Swap baseline and candidate" data-test="compare-swap">⇄</button>
+  <label class="field">Candidate
+    <select [ngModel]="selection.right" (ngModelChange)="selection.right = $event; reselect()" data-test="compare-right"><option *ngFor="let h of history" [ngValue]="h.id">{{versionLabel(h)}}</option></select>
+  </label>
+  <label class="field">Group
+    <select [(ngModel)]="groupFilter" data-test="compare-group"><option value="">All groups</option><option *ngFor="let g of groups" [value]="g">{{g}}</option></select>
+  </label>
+  <label class="field" style="flex-direction:row;align-items:center;gap:6px;padding-top:16px"><input type="checkbox" [(ngModel)]="showUnchanged" data-test="show-unchanged"> show unchanged</label>
+  <span style="flex:1"></span>
+  <button class="btn" (click)="exportCsv()" data-test="export-csv">Export CSV</button>
+</div>
+<div class="legend"><span class="l-changed">changed</span><span class="l-added">added in candidate</span><span class="l-removed">removed in candidate</span><span class="l-violation">outside permitted range</span></div>
+<div class="alert alert-warn" *ngIf="summary.violations" data-test="violation-banner">
+  <strong>{{summary.violations}} setting(s) in v{{right?.versionNo}} fall outside the permitted range.</strong> This file must not be activated until the values are corrected or an engineering deviation is recorded.
+</div>
+<div class="empty" *ngIf="!loading && !visibleRows().length">No differences between the selected versions<span *ngIf="!showUnchanged"> — tick “show unchanged” to list all {{summary.unchanged}} settings</span>.</div>
+<table class="grid compare-grid" *ngIf="visibleRows().length" data-test="compare-table">
+  <thead><tr><th>Group</th><th>LN</th><th>Setting</th><th class="num">{{left ? 'v' + left.versionNo : '—'}}</th><th class="num">{{right ? 'v' + right.versionNo : '—'}}</th><th>Unit</th><th class="num">Δ</th><th>Permitted</th><th>Change</th></tr></thead>
+  <tbody>
+    <tr *ngFor="let r of visibleRows(); trackBy: trackByKey" [ngClass]="rowClass(r)" data-test="compare-row" [attr.data-setting]="r.name" [attr.data-kind]="r.violation ? 'violation' : r.kind">
+      <td>{{r.settingGroup}}</td>
+      <td class="mono">{{r.lnClass}}</td>
+      <td>{{r.name}}</td>
+      <td class="num mono diff-cell-left">{{r.left ? (r.left.value | samNumber) : '—'}}</td>
+      <td class="num mono diff-cell-right">{{r.right ? (r.right.value | samNumber) : '—'}}</td>
+      <td>{{r.unit}}</td>
+      <td class="num mono small">{{delta(r)}}</td>
+      <td class="mono small muted">{{r.minValue !== null ? (r.minValue | samNumber) : ''}}<span *ngIf="r.minValue !== null || r.maxValue !== null"> … </span>{{r.maxValue !== null ? (r.maxValue | samNumber) : ''}}</td>
+      <td><span class="badge" [ngClass]="kindBadge(r)">{{r.violation || r.kind}}</span></td>
+    </tr>
+  </tbody>
+</table>

@@ -7,7 +7,9 @@
 .env
 backend/target/
 data/
+frontend/.angular/
 frontend/coverage/
+frontend/src/ng/
 node_modules/
 tests/ui/node_modules/
 tests/ui/playwright-report/

@@ -9,7 +9,11 @@ test('S4 settings comparison flags the out-of-range slope on CEN01_SGT2_87T', as
   await expect(page.getByTestId('ied-row')).toHaveCount(1);
   await page.getByTestId('ied-row').first().getByTestId('ied-open').click();
   await page.getByTestId('tab-settings').click();
+  const compareStart = performance.now();
   await page.getByTestId('compare-go').click();
+  // Non-gating timing indicator (TST-SETCMP-033): compare-go click → comparison table visible. No threshold.
+  await page.getByTestId('compare-table').waitFor({ state: 'visible' });
+  test.info().annotations.push({ type: 'timing', description: `compare-go → compare-table visible: ${Math.round(performance.now() - compareStart)} ms` });
 
   await expect(page).toHaveURL(/settings\/compare\?left=\d+&right=\d+/);
   await expect(page.locator('h1')).toContainText('Settings comparison — CEN01_SGT2_87T');

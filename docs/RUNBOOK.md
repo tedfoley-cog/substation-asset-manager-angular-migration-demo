@@ -4,7 +4,7 @@
 | What | Command | Check |
 |---|---|---|
 | Backend (H2, seeded) | `cd backend && mvn spring-boot:run` | `curl localhost:8080/api/substations` → JSON list of substations |
-| Frontend | `cd frontend && npm ci && npm start` | `curl localhost:3000/` → 200; `/api/*` proxied |
+| Frontend | `cd frontend && npm ci && npm start` (`prestart` runs `npm run build`, the Angular CLI build into git-ignored `src/ng/`) | `curl localhost:3000/` → 200; `curl localhost:3000/ng/main.js` → 200; `/api/*` proxied |
 | Everything incl. PostgreSQL | `docker compose up --build` | `docker compose ps` → db/backend healthy, frontend up |
 | Backend against local PostgreSQL | `SPRING_PROFILES_ACTIVE=postgres SPRING_DATASOURCE_URL=… mvn spring-boot:run` | Flyway applies V1/V2 |
 
@@ -13,10 +13,12 @@ Maven Central HTTP 429: `MAVEN_MIRROR=https://maven-central.storage-download.goo
 ## Verify
 ```
 cd backend  && mvn test                                   # 53 tests: unit · OpenAPI contract · ArchUnit
-cd frontend && npm run lint && npm test                   # ESLint · Karma (ChromeHeadless)
+cd frontend && npm run build && npm run lint && npm test && npm run test:ng   # Angular CLI build · ESLint · legacy Karma · Angular Karma
 python3 tools/checks/run_all.py --base origin/main        # FM-01..03 (exit 1 on ratchet breach / removed handlers)
 cd tests/ui && npm ci && npx playwright install chromium && npx playwright test    # S1–S6, stack must be up
 ```
+Angular dev loop: run `npm run watch` (rebuilds `src/ng/` on every change under `src/app-ng/`) in a second terminal next to `npm start`.
+
 Gauntlet counts assume a fresh seed; restart the backend (`docker compose down -v && docker compose up`) between runs if a scenario complains about an extra settings version or import.
 
 ## Reset data
