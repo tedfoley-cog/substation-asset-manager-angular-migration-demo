@@ -1,9 +1,9 @@
 # ADR-004 — Comparison logic lives in the client, in framework-neutral `settings-compare.logic.ts`; no server endpoint in this increment
 Stage: architect
-Status: proposed
+Status: accepted
 Date: 2026-10-16
 Upstream: specs/SETCMP/DESIGN.md (DES-SETCMP-007, DES-SETCMP-008, DES-SETCMP-009, DES-SETCMP-010, DES-SETCMP-021, DES-SETCMP-023) ; specs/SETCMP/SPEC.md (REQ-SETCMP-013, REQ-SETCMP-020, REQ-SETCMP-021, REQ-SETCMP-022, REQ-SETCMP-030, REQ-SETCMP-034)
-Approved-by:
+Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16
 
 ## Context
 The whole comparison engine — `EPSILON = 0.0005`, `toNumber` (de-DE grouping), `classify`, `rangeViolation`,
@@ -88,4 +88,4 @@ tolerance/severity rules are documented in TST-SETCMP-001..007, which become the
 
 ## GATE
 
-GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
+GATE: architect — status: PASSED. Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16 (covers ADR-001…006). FYI points acknowledged: DESIGN governs zone.js wording; Document records the IC-20 display-only exception under OQ-1; WI-01 adds frontend/.dockerignore. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

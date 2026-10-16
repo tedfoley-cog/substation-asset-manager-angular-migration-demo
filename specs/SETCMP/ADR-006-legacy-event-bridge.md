@@ -1,9 +1,9 @@
 # ADR-006 — Shared AngularJS services are upgraded once; legacy bus events reach Angular through one RxJS bridge
 Stage: architect
-Status: proposed
+Status: accepted
 Date: 2026-10-16
 Upstream: specs/SETCMP/DESIGN.md (DES-SETCMP-012, DES-SETCMP-017, DES-SETCMP-018) ; specs/SETCMP/SPEC.md (REQ-SETCMP-023, REQ-SETCMP-024, REQ-SETCMP-035)
-Approved-by:
+Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16
 
 ## Context
 Cross-screen communication is a `$rootScope.$broadcast` bus: `EventBus` (`frontend/src/app/core/event-bus.service.js:5–19`)
@@ -63,4 +63,4 @@ end-state once no AngularJS publisher remains.
 
 ## GATE
 
-GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
+GATE: architect — status: PASSED. Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16 (covers ADR-001…006). FYI points acknowledged: DESIGN governs zone.js wording; Document records the IC-20 display-only exception under OQ-1; WI-01 adds frontend/.dockerignore. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

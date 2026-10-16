@@ -1,9 +1,9 @@
 # ADR-001 — Angular owns the single bootstrap (UpgradeModule, strictDi), `ng-app` removed
 Stage: architect
-Status: proposed
+Status: accepted
 Date: 2026-10-16
 Upstream: specs/SETCMP/DESIGN.md (DES-SETCMP-005, DES-SETCMP-014, DES-SETCMP-002) ; specs/SETCMP/SPEC.md (REQ-SETCMP-001, REQ-SETCMP-030, REQ-SETCMP-035)
-Approved-by:
+Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16
 
 ## Context
 Day zero bootstraps AngularJS declaratively: `frontend/src/index.html:2` is `<html lang="en" ng-app="sam">`, followed by
@@ -67,4 +67,4 @@ inverts naturally (UpgradeModule removed, `bootstrap: [AppComponent]` added).
 
 ## GATE
 
-GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
+GATE: architect — status: PASSED. Approved-by: Teddy Foley (delegated to the parent Devin session for this dry run) 2026-10-16 (covers ADR-001…006). FYI points acknowledged: DESIGN governs zone.js wording; Document records the IC-20 display-only exception under OQ-1; WI-01 adds frontend/.dockerignore. Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
