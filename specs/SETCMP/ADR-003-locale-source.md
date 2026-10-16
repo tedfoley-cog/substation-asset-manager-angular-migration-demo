@@ -70,3 +70,7 @@ TST-SETCMP-020 (reload on `userChanged$`), TST-SETCMP-036 (`sdubois` fr-FR opens
 Medium-low: the two pipes are the only formatting surface of the screen; replacing them with `DecimalPipe`/`DatePipe`
 later is a template-level change plus locale-data registration, bounded by the parity spec. The decision does not
 touch the backend or the URL/DOM contract.
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

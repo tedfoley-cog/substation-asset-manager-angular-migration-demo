@@ -65,3 +65,7 @@ corrective, step; nothing in this increment pre-empts how it is done.
   (from the loaded file), while DES-013 uses `$state.params.id`. Both are the same IED for every seeded and uploaded
   file, so visible text and URL are unchanged; the coder should keep the `$state.params.id` form as designed, but the
   reviewer may want this equivalence stated in the component spec (TST-SETCMP-017/035).
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

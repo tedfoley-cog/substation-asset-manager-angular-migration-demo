@@ -64,3 +64,7 @@ inverts naturally (UpgradeModule removed, `bootstrap: [AppComponent]` added).
 - `specs/SETCMP/WORK_ITEMS.md` WI-02 says `main.ts` does `import 'zone.js'`, whereas DES-SETCMP-005 puts zone.js in the
   CLI `polyfills` array and forbids importing it elsewhere. DESIGN.md governs; the WI wording should be aligned by the
   Document stage. Likewise WI text says "18 app scripts", `index.html` lines 52–70 hold 19.
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

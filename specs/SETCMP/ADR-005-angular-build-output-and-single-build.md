@@ -69,3 +69,7 @@ lines). Changing the output directory later is a one-line `outputPath` + script-
   `node_modules/` or `src/ng/` is in the build context it is copied into the image (slow, and a stale bundle could mask
   a broken build before `npm run build` overwrites it). Not a DES change — WI-01 should add a `.dockerignore`
   (`node_modules`, `src/ng`, `.angular`) or confirm the context is clean in CI.
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

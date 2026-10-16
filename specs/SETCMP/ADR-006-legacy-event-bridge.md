@@ -60,3 +60,7 @@ untouched), TST-SETCMP-026 (FM-02 no net removed handler), TST-SETCMP-028 (S3 up
 ## Reversibility
 Low: five small files under `src/app-ng/core/`. Replacing the bridge with native RxJS publishers is the planned
 end-state once no AngularJS publisher remains.
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb

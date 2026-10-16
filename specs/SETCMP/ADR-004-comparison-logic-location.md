@@ -85,3 +85,7 @@ tolerance/severity rules are documented in TST-SETCMP-001..007, which become the
   computation.
 - UM-30 ("one `npm install && npm run build`") vs the WI-03..05 `pretest → build:logic` hook: `npm test` temporarily
   depends on an esbuild step. Accepted as transitional by DES-009; confirm the reviewer is comfortable with it.
+
+## GATE
+
+GATE: architect — status: WAITING FOR HUMAN APPROVAL. Coding must not start until `Approved-by:` in the header is filled by a human message of the form `Approved-by: <name> <YYYY-MM-DD>` (one approval covers ADR-001…006). Orchestrator: https://devin-gtm.devinenterprise.com/sessions/94789f2008a241d1809df347bc530bcb
