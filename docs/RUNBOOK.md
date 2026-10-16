@@ -17,6 +17,8 @@ cd frontend && npm run build && npm run lint && npm test && npm run test:ng   # 
 python3 tools/checks/run_all.py --base origin/main        # FM-01..03 (exit 1 on ratchet breach / removed handlers)
 cd tests/ui && npm ci && npx playwright install chromium && npx playwright test    # S1–S6, stack must be up
 ```
+Angular dev loop: run `npm run watch` (rebuilds `src/ng/` on every change under `src/app-ng/`) in a second terminal next to `npm start`.
+
 Gauntlet counts assume a fresh seed; restart the backend (`docker compose down -v && docker compose up`) between runs if a scenario complains about an extra settings version or import.
 
 ## Reset data

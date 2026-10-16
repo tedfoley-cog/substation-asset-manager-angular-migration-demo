@@ -32,7 +32,7 @@ def scan(path, patterns):
 
 def main(argv):
     findings = []
-    for p in files(FRONTEND_GLOBS + ["frontend/src/app/**/*.html"]):
+    for p in files(FRONTEND_GLOBS + ["frontend/src/app/**/*.html", "frontend/src/app-ng/**/*.html"]):
         findings += scan(p, FRONT)
     for p in files(BACKEND_GLOBS):
         findings += scan(p, BACK)

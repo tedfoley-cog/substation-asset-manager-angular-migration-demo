@@ -8,7 +8,6 @@ module.exports = function (config) {
       'node_modules/angular-sanitize/angular-sanitize.js',
       'node_modules/@uirouter/angularjs/release/angular-ui-router.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'src/ng/settings-compare.logic.js',
       'src/app/app.module.js',
       'src/app/**/*.js',
       'test/unit/_helpers.js',
