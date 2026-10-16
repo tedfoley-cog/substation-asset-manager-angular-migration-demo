@@ -1,3 +1,8 @@
-// Angular entry point. WI-01 ships the toolchain only: the bundle is built but not yet referenced by index.html,
-// and nothing bootstraps until WI-02 (DES-SETCMP-005).
-export { AppModule } from './app.module';
+// Angular entry point, loaded by index.html after every legacy AngularJS script (DES-SETCMP-005).
+// zone.js comes from the CLI polyfills option (angular.json); it is deliberately not imported here (ADR-001).
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppModule } from './app.module';
+
+platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  .catch((err: unknown) => console.error('[sam] Angular bootstrap failed', err));

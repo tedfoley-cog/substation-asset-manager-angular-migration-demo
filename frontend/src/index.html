@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="sam">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Substation Asset Manager</title>
@@ -68,5 +68,10 @@
   <script src="app/scl/scl-import.controller.js"></script>
   <script src="app/records/records.controller.js"></script>
   <script src="app/audit/audit.controller.js"></script>
+  <!-- Angular CLI bundle (built into src/ng/ by npm run build). Loaded last; AppModule.ngDoBootstrap boots the
+       AngularJS "sam" module via UpgradeModule with strictDi (DES-SETCMP-005, ADR-001). No ng-app above. -->
+  <script src="ng/runtime.js"></script>
+  <script src="ng/polyfills.js"></script>
+  <script src="ng/main.js"></script>
 </body>
 </html>
