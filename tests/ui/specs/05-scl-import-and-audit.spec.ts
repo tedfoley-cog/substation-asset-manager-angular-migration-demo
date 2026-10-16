@@ -9,6 +9,7 @@ const FIXTURES = path.resolve(__dirname, '../../../backend/src/test/resources/sc
 test('S5 golden path: SCL import → firmware modal → denied download → audit trail', async ({ page }) => {
   await signInAs(page, USERS.engineer2);
   await page.getByTestId('nav-scl').click();
+  await expect(page.getByTestId('scl-import-row').first()).toBeVisible();
   const before = await page.getByTestId('scl-import-row').count();
   expect(before).toBeGreaterThanOrEqual(7);
   await expect(page.getByTestId('scl-import-row').filter({ hasText: 'NTH-02_SGT1_refurb.scd' })).toHaveAttribute('data-status', 'FAILED');
