@@ -1,5 +1,6 @@
 package com.meridian.sam.web;
 
+import com.meridian.sam.domain.Substation;
 import com.meridian.sam.service.SubstationService;
 import com.meridian.sam.web.dto.BayDto;
 import com.meridian.sam.web.dto.SubstationDto;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/substations")
@@ -18,13 +20,16 @@ public class SubstationController {
     @GetMapping
     @Operation(summary = "List substations, optionally filtered by region")
     public List<SubstationDto> list(@RequestParam(required = false) String region) {
-        return service.list(region).stream().map(s -> DtoMapper.substation(s, service.iedCount(s.getId()), false)).toList();
+        List<Substation> list = service.list(region);
+        Map<Long, Long> iedCounts = service.iedCounts(list.stream().map(Substation::getId).toList());
+        return list.stream().map(s -> DtoMapper.substation(s, iedCounts.get(s.getId()), false)).toList();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Substation detail including bays")
     public SubstationDto get(@PathVariable Long id) {
-        return DtoMapper.substation(service.get(id), service.iedCount(id), true);
+        Substation substation = service.get(id);
+        return DtoMapper.substation(substation, service.iedCount(id), true);
     }
 
     @GetMapping("/{id}/bays")
