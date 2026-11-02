@@ -9,10 +9,10 @@ import java.util.Optional;
 public interface SubstationRepository extends JpaRepository<Substation, Long> {
     Optional<Substation> findByCode(String code);
 
-    @EntityGraph(attributePaths = {"bays", "bays.ieds"})
+    @EntityGraph(attributePaths = "bays")
     List<Substation> findAllByOrderByCodeAsc();
 
-    @EntityGraph(attributePaths = {"bays", "bays.ieds"})
+    @EntityGraph(attributePaths = "bays")
     List<Substation> findByRegionIgnoreCaseOrderByCodeAsc(String region);
 
     @EntityGraph(attributePaths = {"bays", "bays.ieds"})
