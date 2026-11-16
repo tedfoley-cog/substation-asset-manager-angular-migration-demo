@@ -94,7 +94,7 @@ docker-compose.yml          db (PostgreSQL 16) · backend · frontend
 ## Key concepts
 
 - **IED / relay** — intelligent electronic device: a protection relay, bay controller or merging unit in a substation bay. Modelled with vendor, model, firmware, lifecycle status and IEC 61850 logical nodes (`PDIF`, `PTOC`, `PDIS`, `XCBR` …).
-- **Settings file** — a versioned relay configuration (`v1`, `v2`, `v3` …). Exactly one version is ACTIVE per IED; uploads are validated against each setting's permitted range. Comparison (currently client-side, in a controller — the thing the migration must move) classifies rows as changed / added / removed / unchanged and flags range violations first.
+- **Settings file** — a versioned relay configuration (`v1`, `v2`, `v3` …). ACTIVE versions are the ones enforced on the IED, and several may be ACTIVE at once (an upload supersedes them unless `supersedeExisting` is false; files can be enforced or withdrawn individually); uploads are validated against each setting's permitted range. Comparison (currently client-side, in a controller — the thing the migration must move) classifies rows as changed / added / removed / unchanged and flags range violations first.
 - **SCL import** — IEC 61850 System Configuration Language files describing IEDs and their data model; parsed namespace-aware with XXE disabled, then matched to inventory IEDs.
 - **COMTRADE record** — a disturbance (fault) recording as `.cfg/.dat/.hdr`; downloads are role-checked and audited.
 - **Audit trail** — append-only `audit_event` rows for every mutation, with actor, outcome and before/after detail.
