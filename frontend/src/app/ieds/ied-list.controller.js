@@ -47,7 +47,8 @@
 
       var unsubs = [
         EventBus.subscribe(EventBus.EVENTS.USER_CHANGED, load),
-        EventBus.subscribe(EventBus.EVENTS.FIRMWARE_CHANGED, load)
+        EventBus.subscribe(EventBus.EVENTS.FIRMWARE_CHANGED, load),
+        EventBus.subscribe(EventBus.EVENTS.SETTINGS_UPLOADED, load)
       ];
       $scope.$on('$destroy', function () { unsubs.forEach(function (u) { u(); }); });
       load();

@@ -4,6 +4,7 @@ public enum Role {
     VIEWER, ENGINEER, PROTECTION_ADMIN, AUDITOR;
 
     public boolean canUploadSettings() { return this == ENGINEER || this == PROTECTION_ADMIN; }
+    public boolean canEnforceSettings() { return this == ENGINEER || this == PROTECTION_ADMIN; }
     public boolean canImportScl() { return this == ENGINEER || this == PROTECTION_ADMIN; }
     public boolean canAssignFirmware() { return this == PROTECTION_ADMIN; }
     public boolean canDownloadRecords() { return this == ENGINEER || this == PROTECTION_ADMIN; }

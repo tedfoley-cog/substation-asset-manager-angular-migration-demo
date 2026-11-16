@@ -11,7 +11,8 @@ public interface SettingsFileRepository extends JpaRepository<SettingsFile, Long
     @EntityGraph(attributePaths = {"ied"})
     List<SettingsFile> findByIedIdOrderByVersionNoDesc(Long iedId);
 
-    Optional<SettingsFile> findFirstByIedIdAndStatus(Long iedId, SettingsStatus status);
+    @EntityGraph(attributePaths = {"ied"})
+    List<SettingsFile> findByIedIdAndStatusOrderByVersionNoDesc(Long iedId, SettingsStatus status);
 
     long countByIedId(Long iedId);
 

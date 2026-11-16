@@ -38,4 +38,13 @@ class SettingsServiceValidationTest {
     void emptyValueListIsRejected() {
         assertThat(service.validate(new SettingsUploadRequest(null, false, List.of()))).containsExactly("At least one setting value is required");
     }
+
+    @Test
+    void onlyNonDraftUploadsSupersedeAndOnlyWhenNotOptedOut() {
+        var values = List.of(v("87T Pickup", "0.30", "0.10", "1.00"));
+        assertThat(new SettingsUploadRequest("ok", false, values).supersedes()).isTrue();
+        assertThat(new SettingsUploadRequest("ok", false, values, true).supersedes()).isTrue();
+        assertThat(new SettingsUploadRequest("ok", false, values, false).supersedes()).isFalse();
+        assertThat(new SettingsUploadRequest("ok", true, values, true).supersedes()).isFalse();
+    }
 }

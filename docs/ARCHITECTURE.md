@@ -7,7 +7,7 @@ browser ── :3000 frontend/server/dev-server.js (static + /api proxy) ── 
 
 ## Backend — `backend/` (Spring Boot 3.3, Java 17)
 - `web/` — `@RestController`s return DTOs only (ArchUnit-enforced; controllers may not touch repositories or return entities). `ApiExceptionHandler` produces the standard error envelope `{status, error, message, path, timestamp, details[]}`.
-- `service/` — transactional use-cases: `SubstationService`, `IedService`, `SettingsService` (upload validation against min/max, version numbering, single ACTIVE), `SclImportService`, `RecordService` (COMTRADE download + audit), `AuditService` (append-only), `Permissions`.
+- `service/` — transactional use-cases: `SubstationService`, `IedService`, `SettingsService` (upload validation against min/max, version numbering, several ACTIVE (enforced) files per IED via optional supersede and `enforce`/`unenforce`), `SclImportService`, `RecordService` (COMTRADE download + audit), `AuditService` (append-only), `Permissions`.
 - `scl/` — namespace-aware IEC 61850 SCL parser (`http://www.iec.ch/61850/2003/SCL`), XXE/DTD disabled, 5 MB limit, extension allow-list.
 - `domain/` + `repository/` — JPA entities and Spring Data repositories; `@EntityGraph`s avoid N+1 on estate/detail reads.
 - `db/migration/` — Flyway `V1__baseline_schema.sql`, `V2__reference_data.sql` (fictional multi-site transmission estate: substations, bays, IEDs, settings history, SCL imports, COMTRADE records, audit history).

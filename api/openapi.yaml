@@ -198,7 +198,7 @@ components:
     IedDto:
       properties:
         activeSettingsVersion:
-          description: versionNo of the ACTIVE settings file, null when none
+          description: versionNo of the newest ACTIVE (enforced) settings file, null when none
           format: int32
           nullable: true
           type: integer
@@ -215,6 +215,12 @@ components:
           - BAY_CONTROLLER
           - MERGING_UNIT
           type: string
+        enforcedSettingsVersions:
+          description: versionNo of every ACTIVE (enforced) settings file, newest first; empty when none
+          items:
+            format: int32
+            type: integer
+          type: array
         firmware:
           $ref: '#/components/schemas/FirmwareDto'
           nullable: true
@@ -283,6 +289,7 @@ components:
       - bayName
       - settingsFileCount
       - recordCount
+      - enforcedSettingsVersions
       type: object
     SclImportDto:
       properties:
@@ -462,6 +469,11 @@ components:
           minLength: 0
           type: string
         draft:
+          type: boolean
+        supersedeExisting:
+          description: Non-draft uploads only. true or omitted supersedes every enforced file; false enforces the new file
+            alongside them
+          nullable: true
           type: boolean
         values:
           items:
@@ -866,6 +878,31 @@ paths:
       summary: Upload a new settings-file version (ENGINEER or PROTECTION_ADMIN)
       tags:
       - Settings files
+  /api/ieds/{iedId}/settings/enforced:
+    get:
+      operationId: enforced
+      parameters:
+      - in: path
+        name: iedId
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/SettingsFileDto'
+                type: array
+          description: OK
+      summary: Settings files currently enforced on an IED, newest first (no values)
+      tags:
+      - Settings files
+      x-contract-example:
+        minItems: 1
+        request: /api/ieds/1/settings/enforced
   /api/me:
     get:
       operationId: me
@@ -1057,6 +1094,46 @@ paths:
       - Settings files
       x-contract-example:
         request: /api/settings/1
+  /api/settings/{fileId}/enforce:
+    post:
+      operationId: enforce
+      parameters:
+      - in: path
+        name: fileId
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SettingsFileDto'
+          description: OK
+      summary: Enforce a settings file alongside any already enforced (ENGINEER or PROTECTION_ADMIN)
+      tags:
+      - Settings files
+  /api/settings/{fileId}/unenforce:
+    post:
+      operationId: unenforce
+      parameters:
+      - in: path
+        name: fileId
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SettingsFileDto'
+          description: OK
+      summary: Withdraw an enforced settings file; it becomes SUPERSEDED (ENGINEER or PROTECTION_ADMIN)
+      tags:
+      - Settings files
   /api/substations:
     get:
       operationId: list_1

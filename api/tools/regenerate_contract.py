@@ -18,7 +18,7 @@ DST = ROOT / "api" / "openapi.yaml"
 REQUIRED = {
     "SubstationDto": ["id", "code", "name", "region", "nominalKv", "bayCount", "iedCount"],
     "BayDto": ["id", "substationId", "name", "bayType", "nominalKv", "iedCount"],
-    "IedDto": ["id", "name", "deviceType", "platform", "model", "serialNumber", "status", "substationId", "substationCode", "substationName", "bayId", "bayName"],
+    "IedDto": ["id", "name", "deviceType", "platform", "model", "serialNumber", "status", "substationId", "substationCode", "substationName", "bayId", "bayName", "enforcedSettingsVersions"],
     "FirmwareDto": ["id", "platform", "version", "releasedOn", "approved", "endOfLife"],
     "SettingsFileDto": ["id", "iedId", "iedName", "versionNo", "filename", "status", "uploadedBy", "uploadedAt", "checksumSha256"],
     "SettingValueDto": ["settingGroup", "lnClass", "name"],
@@ -48,6 +48,7 @@ EXAMPLES = {
     "/api/ieds/{id}": {"request": "/api/ieds/1"},
     "/api/firmware": {"request": "/api/firmware", "minItems": 10},
     "/api/ieds/{iedId}/settings": {"request": "/api/ieds/1/settings", "minItems": 3},
+    "/api/ieds/{iedId}/settings/enforced": {"request": "/api/ieds/1/settings/enforced", "minItems": 1},
     "/api/settings/{fileId}": {"request": "/api/settings/1"},
     "/api/scl/imports": {"request": "/api/scl/imports", "minItems": 7},
     "/api/scl/imports/{id}": {"request": "/api/scl/imports/1"},

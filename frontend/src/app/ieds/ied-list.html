@@ -79,7 +79,7 @@
     <dt>IP / IED name (SCL)</dt><dd class="mono">{{selected.ipAddress || '—'}} · {{selected.sclIedName || '—'}}</dd>
     <dt>Installed</dt><dd>{{selected.installedOn | samDate:'date'}}</dd>
     <dt>Last seen</dt><dd>{{selected.lastSeenAt | samDate:'seconds'}}</dd>
-    <dt>Settings</dt><dd>{{selected.activeSettingsVersion ? 'v' + selected.activeSettingsVersion : 'none active'}} · {{selected.settingsFileCount}} file(s)</dd>
+    <dt>Settings</dt><dd data-test="drawer-enforced">{{selected.enforcedSettingsVersions.length ? 'v' + selected.enforcedSettingsVersions.join(', v') + ' enforced' : 'none enforced'}} · {{selected.settingsFileCount}} file(s)</dd>
     <dt>Disturbance records</dt><dd>{{selected.recordCount}}</dd>
   </dl>
   <div class="mt" style="display:flex;gap:8px;flex-wrap:wrap">
