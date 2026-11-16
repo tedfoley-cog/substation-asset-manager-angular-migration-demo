@@ -110,7 +110,7 @@
         (enforce ? ApiClient.enforceSettings(h.id) : ApiClient.unenforceSettings(h.id)).then(function (file) {
           EventBus.toast('success', enforce ? 'Settings enforced' : 'Settings withdrawn',
             file.filename + (enforce ? ' is now enforced on ' : ' is no longer enforced on ') + file.iedName);
-          EventBus.publish(EventBus.EVENTS.SETTINGS_ENFORCEMENT_CHANGED, file);
+          EventBus.publish(EventBus.EVENTS.SETTINGS_UPLOADED, file);
           return load();
         }).catch(function (rej) {
           var body = rej.data || {};
