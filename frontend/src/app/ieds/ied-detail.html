@@ -28,7 +28,7 @@
       <dt>Network</dt><dd class="mono">{{ied.ipAddress || '—'}} <span class="muted">· SCL IED name</span> {{ied.sclIedName || '—'}}</dd>
       <dt>Installed</dt><dd>{{ied.installedOn | samDate:'date'}}</dd>
       <dt>Last seen</dt><dd>{{ied.lastSeenAt | samDate:'seconds'}}</dd>
-      <dt>Active settings</dt><dd>{{ied.activeSettingsVersion ? 'v' + ied.activeSettingsVersion : 'none'}}</dd>
+      <dt>Enforced settings</dt><dd data-test="overview-enforced">{{ied.enforcedSettingsVersions.length ? 'v' + ied.enforcedSettingsVersions.join(', v') : 'none'}}</dd>
       <dt>Notes</dt><dd>{{ied.notes || '—'}}</dd>
     </dl>
   </div>
@@ -59,7 +59,10 @@
             <span class="field-error" ng-if="uploadForm.comment.$touched && uploadForm.comment.$invalid">Comment of at least 8 characters is required.</span>
           </label>
           <label class="field">Save as
-            <select ng-model="upload.draft" ng-options="o.v as o.l for o in [{v:false,l:'Active (supersedes current)'},{v:true,l:'Draft'}]" data-test="upload-draft"></select>
+            <select ng-model="upload.draft" ng-options="o.v as o.l for o in [{v:false,l:'Active (enforced)'},{v:true,l:'Draft'}]" data-test="upload-draft"></select>
+          </label>
+          <label class="field" ng-if="!upload.draft && enforced.length">Currently enforced ({{enforcedLabel()}})
+            <select ng-model="upload.supersede" ng-options="o.v as o.l for o in [{v:true,l:'Supersede them'},{v:false,l:'Keep enforced alongside'}]" data-test="upload-supersede"></select>
           </label>
         </div>
         <table class="grid">
@@ -86,8 +89,12 @@
       </form>
     </div>
 
+    <p class="muted small" data-test="enforced-summary">
+      <span ng-if="enforced.length">Enforced on {{ied.name}}: <strong>{{enforcedLabel()}}</strong> ({{enforced.length}} file<span ng-if="enforced.length !== 1">s</span>)</span>
+      <span ng-if="!enforced.length">No settings file is enforced on {{ied.name}}.</span>
+    </p>
     <table class="grid" data-test="settings-history">
-      <thead><tr><th>Version</th><th>File</th><th>Status</th><th>Uploaded by</th><th>Uploaded</th><th>Comment</th><th>SHA-256</th></tr></thead>
+      <thead><tr><th>Version</th><th>File</th><th>Status</th><th>Uploaded by</th><th>Uploaded</th><th>Comment</th><th>SHA-256</th><th></th></tr></thead>
       <tbody>
         <tr ng-repeat="h in history" data-test="settings-version" data-version="{{h.versionNo}}">
           <td><strong>v{{h.versionNo}}</strong></td>
@@ -97,6 +104,11 @@
           <td class="nowrap">{{h.uploadedAt | samDate}}</td>
           <td>{{h.comment}}</td>
           <td class="mono small">{{h.checksumSha256.substring(0, 12)}}…</td>
+          <td class="nowrap">
+            <button class="btn btn-sm" ng-click="toggleEnforcement(h)" ng-disabled="!can('settings:enforce') || enforcing[h.id]"
+                    title="{{can('settings:enforce') ? '' : 'Requires Protection Engineer or Admin'}}"
+                    data-test="{{h.status === 'ACTIVE' ? 'settings-unenforce' : 'settings-enforce'}}">{{h.status === 'ACTIVE' ? 'Withdraw' : 'Enforce'}}</button>
+          </td>
         </tr>
       </tbody>
     </table>

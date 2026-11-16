@@ -10,6 +10,7 @@
       TOAST: 'sam:toast',
       IED_SELECTED: 'sam:iedSelected',
       SETTINGS_UPLOADED: 'sam:settingsUploaded',
+      SETTINGS_ENFORCEMENT_CHANGED: 'sam:settingsEnforcementChanged',
       FIRMWARE_CHANGED: 'sam:firmwareChanged',
       SCL_IMPORTED: 'sam:sclImported'
     })

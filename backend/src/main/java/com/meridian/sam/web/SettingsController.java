@@ -25,6 +25,24 @@ public class SettingsController {
         return service.history(iedId).stream().map(f -> DtoMapper.settingsFile(f, false)).toList();
     }
 
+    @GetMapping("/ieds/{iedId}/settings/enforced")
+    @Operation(summary = "Settings files currently enforced on an IED, newest first (no values)")
+    public List<SettingsFileDto> enforced(@PathVariable Long iedId) {
+        return service.enforced(iedId).stream().map(f -> DtoMapper.settingsFile(f, false)).toList();
+    }
+
+    @PostMapping("/settings/{fileId}/enforce")
+    @Operation(summary = "Enforce a settings file alongside any already enforced (ENGINEER or PROTECTION_ADMIN)")
+    public SettingsFileDto enforce(@PathVariable Long fileId, CurrentUser user, HttpServletRequest request) {
+        return DtoMapper.settingsFile(service.enforce(fileId, user, request.getRemoteAddr()), false);
+    }
+
+    @PostMapping("/settings/{fileId}/unenforce")
+    @Operation(summary = "Withdraw an enforced settings file; it becomes SUPERSEDED (ENGINEER or PROTECTION_ADMIN)")
+    public SettingsFileDto unenforce(@PathVariable Long fileId, CurrentUser user, HttpServletRequest request) {
+        return DtoMapper.settingsFile(service.unenforce(fileId, user, request.getRemoteAddr()), false);
+    }
+
     @GetMapping("/settings/{fileId}")
     @Operation(summary = "Settings file with every setting value")
     public SettingsFileDto get(@PathVariable Long fileId) {

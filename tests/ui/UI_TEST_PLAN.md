@@ -12,6 +12,7 @@ suite must stay green when a screen moves from AngularJS to Angular (UM-20).
 | S4 | `04-settings-compare` | **The feature being migrated** | Business-logic screen, locale, export | 87T Slope 2 = 95 > max 90 first; counters = rows; de-DE decimals; swap clears violation; CSV filename |
 | S5 | `05-scl-import-and-audit` | "Chained golden path across roles" | Modal, permissions, audit trail | failed then successful SCD import (3 of 4 matched); admin assigns unapproved 2.50.03 via modal; viewer 403; auditor sees DENIED/SUCCESS rows |
 | S6 | `06-records-browser` | "Post-fault review" | Filter + download side-effect | NTH-01 pending = 2; `.cfg` download; record shows collected by mbrandt |
+| S7 | `07-settings-multi-enforce` | "Several settings files enforced at once" | Row actions + permissions | NTH01_T2_87T: enforce superseded v1 next to v2; upload v3 keeping both; withdraw v1 → v3, v2 enforced; viewer controls disabled |
 
 ## Live finale (demo)
 

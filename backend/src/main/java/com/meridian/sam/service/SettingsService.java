@@ -41,6 +41,44 @@ public class SettingsService {
         return files.findWithValuesById(fileId).orElseThrow(() -> new NotFoundException("Settings file", fileId));
     }
 
+    public List<SettingsFile> enforced(Long iedId) {
+        ieds.findById(iedId).orElseThrow(() -> new NotFoundException("IED", iedId));
+        return files.findByIedIdAndStatusOrderByVersionNoDesc(iedId, SettingsStatus.ACTIVE);
+    }
+
+    @Transactional
+    public SettingsFile enforce(Long fileId, CurrentUser user, String clientIp) {
+        return changeEnforcement(fileId, true, user, clientIp);
+    }
+
+    @Transactional
+    public SettingsFile unenforce(Long fileId, CurrentUser user, String clientIp) {
+        return changeEnforcement(fileId, false, user, clientIp);
+    }
+
+    private SettingsFile changeEnforcement(Long fileId, boolean enforce, CurrentUser user, String clientIp) {
+        SettingsFile file = get(fileId);
+        String action = enforce ? "SETTINGS_ENFORCE" : "SETTINGS_UNENFORCE";
+        try {
+            Permissions.require(user, Role::canEnforceSettings, enforce ? "enforce settings" : "withdraw settings");
+            SettingsStatus before = file.getStatus();
+            if (enforce && before == SettingsStatus.ACTIVE) {
+                throw new ValidationException(List.of(file.getFilename() + " is already enforced"));
+            }
+            if (!enforce && before != SettingsStatus.ACTIVE) {
+                throw new ValidationException(List.of(file.getFilename() + " is not enforced"));
+            }
+            file.setStatus(enforce ? SettingsStatus.ACTIVE : SettingsStatus.SUPERSEDED);
+            audit.record(user.username(), action, "IED", file.getIed().getName(), "SUCCESS",
+                file.getFilename() + ": " + before + " -> " + file.getStatus(), clientIp);
+            return file;
+        } catch (RuntimeException e) {
+            audit.record(user.username(), action, "IED", file.getIed().getName(),
+                e instanceof AccessDeniedException ? "DENIED" : "FAILURE", e.getMessage(), clientIp);
+            throw e;
+        }
+    }
+
     @Transactional
     public SettingsFile upload(Long iedId, SettingsUploadRequest request, CurrentUser user, String clientIp) {
         Ied ied = ieds.findById(iedId).orElseThrow(() -> new NotFoundException("IED", iedId));
@@ -52,9 +90,8 @@ public class SettingsService {
             }
             int next = files.findFirstByIedIdOrderByVersionNoDesc(iedId).map(f -> f.getVersionNo() + 1).orElse(1);
             SettingsStatus status = request.draft() ? SettingsStatus.DRAFT : SettingsStatus.ACTIVE;
-            if (status == SettingsStatus.ACTIVE) {
-                files.findByIedIdOrderByVersionNoDesc(iedId).stream()
-                    .filter(f -> f.getStatus() == SettingsStatus.ACTIVE)
+            if (request.supersedes()) {
+                files.findByIedIdAndStatusOrderByVersionNoDesc(iedId, SettingsStatus.ACTIVE)
                     .forEach(f -> f.setStatus(SettingsStatus.SUPERSEDED));
             }
             String filename = ied.getName() + "_v" + String.format("%03d", next) + ".rsf";
@@ -66,7 +103,7 @@ public class SettingsService {
             SettingsFile saved = files.save(file);
             ied.setLastSettingsUploadAt(saved.getUploadedAt());
             audit.record(user.username(), "SETTINGS_UPLOAD", "IED", ied.getName(), "SUCCESS",
-                "Uploaded " + filename + (request.draft() ? " as DRAFT" : ""), clientIp);
+                "Uploaded " + filename + (request.draft() ? " as DRAFT" : request.supersedes() ? "" : " (enforced alongside existing)"), clientIp);
             return saved;
         } catch (RuntimeException e) {
             audit.record(user.username(), "SETTINGS_UPLOAD", "IED", ied.getName(),

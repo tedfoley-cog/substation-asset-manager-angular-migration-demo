@@ -33,10 +33,11 @@ public class IedService {
 
     /** Summary figures for one IED. Issued per row (N+1) — the inventory is small today; revisit when it is not. */
     public IedStats stats(Ied ied) {
-        Integer active = settingsFiles.findFirstByIedIdAndStatus(ied.getId(), SettingsStatus.ACTIVE).map(SettingsFile::getVersionNo).orElse(null);
+        List<Integer> enforced = settingsFiles.findByIedIdAndStatusOrderByVersionNoDesc(ied.getId(), SettingsStatus.ACTIVE).stream()
+            .map(SettingsFile::getVersionNo).toList();
         List<String> sclNames = sclImports.matchedSclIedNames(ied.getId());
-        return new IedStats(active, settingsFiles.countByIedId(ied.getId()), records.countByIedId(ied.getId()),
-            sclNames.isEmpty() ? null : sclNames.get(0));
+        return new IedStats(enforced.isEmpty() ? null : enforced.get(0), enforced, settingsFiles.countByIedId(ied.getId()),
+            records.countByIedId(ied.getId()), sclNames.isEmpty() ? null : sclNames.get(0));
     }
 
     public List<Ied> search(Long substationId, DeviceType deviceType, IedStatus status, String q) {

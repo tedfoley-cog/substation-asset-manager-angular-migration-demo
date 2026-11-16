@@ -20,4 +20,15 @@ describe('ApiClient + interceptors', function () {
     expect(err.status).toBe(403);
     expect(err.message).toBe('Role ENGINEER may not assign firmware');
   });
+  it('posts enforce / unenforce for a settings file and reads the enforced set', function () {
+    $httpBackend.expectPOST('/api/settings/5/enforce').respond({ id: 5, status: 'ACTIVE' });
+    $httpBackend.expectPOST('/api/settings/5/unenforce').respond({ id: 5, status: 'SUPERSEDED' });
+    $httpBackend.expectGET('/api/ieds/3/settings/enforced').respond([{ id: 6, versionNo: 2, status: 'ACTIVE' }]);
+    var out = [];
+    ApiClient.enforceSettings(5).then(function (f) { out.push(f.status); });
+    ApiClient.unenforceSettings(5).then(function (f) { out.push(f.status); });
+    ApiClient.enforcedSettings(3).then(function (l) { out.push(l.length); });
+    $httpBackend.flush();
+    expect(out).toEqual(['ACTIVE', 'SUPERSEDED', 1]);
+  });
 });

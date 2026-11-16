@@ -11,7 +11,8 @@
       $scope.statuses = ['IN_SERVICE', 'COMMISSIONING', 'MAINTENANCE', 'DECOMMISSIONED'];
       $scope.modal = null;
       $scope.compare = { left: null, right: null };
-      $scope.upload = { open: false, draft: false, comment: '', rows: [], errors: [] };
+      $scope.upload = { open: false, draft: false, supersede: true, comment: '', rows: [], errors: [] };
+      $scope.enforcing = {};
       $scope.can = SessionService.can;
 
       function load() {
@@ -19,7 +20,8 @@
           $scope.ied = r[0];
           $scope.history = r[1];
           $scope.records = r[2];
-          var active = $scope.history.filter(function (h) { return h.status === 'ACTIVE'; })[0];
+          $scope.enforced = $scope.history.filter(function (h) { return h.status === 'ACTIVE'; });
+          var active = $scope.enforced[0];
           var previous = $scope.history.filter(function (h) { return active && h.versionNo < active.versionNo; })[0];
           $scope.compare.right = active ? active.id : ($scope.history[0] ? $scope.history[0].id : null);
           $scope.compare.left = previous ? previous.id : null;
@@ -65,7 +67,7 @@
 
       // --- settings upload (inline form) -----------------------------------------------------------
       $scope.openUpload = function () {
-        $scope.upload = { open: true, draft: false, comment: '', errors: [], rows: [] };
+        $scope.upload = { open: true, draft: false, supersede: true, comment: '', errors: [], rows: [] };
         var source = $scope.history.filter(function (h) { return h.status === 'ACTIVE'; })[0] || $scope.history[0];
         if (!source) { return; }
         ApiClient.settingsFile(source.id).then(function (file) {
@@ -85,7 +87,7 @@
         $scope.upload.errors = [];
         if (form.$invalid) { $scope.upload.errors.push('Complete the highlighted fields before uploading.'); return; }
         $scope.upload.busy = true;
-        var payload = { comment: $scope.upload.comment, draft: $scope.upload.draft, values: $scope.upload.rows.map(function (r) {
+        var payload = { comment: $scope.upload.comment, draft: $scope.upload.draft, supersedeExisting: $scope.upload.draft ? null : $scope.upload.supersede, values: $scope.upload.rows.map(function (r) {
           return { settingGroup: r.settingGroup, lnClass: r.lnClass, name: r.name, value: r.value, unit: r.unit, minValue: r.minValue, maxValue: r.maxValue }; }) };
         ApiClient.uploadSettings($scope.ied.id, payload).then(function (created) {
           $scope.upload.open = false;
@@ -96,6 +98,24 @@
           var body = rej.data || {};
           $scope.upload.errors = [body.message || 'Upload failed'].concat(body.details || []);
         }).finally(function () { $scope.upload.busy = false; });
+      };
+
+      // --- enforcement: several files may be enforced on the IED at once ---------------------------
+      $scope.enforcedLabel = function () {
+        return ($scope.enforced || []).map(function (h) { return 'v' + h.versionNo; }).join(', ');
+      };
+      $scope.toggleEnforcement = function (h) {
+        var enforce = h.status !== 'ACTIVE';
+        $scope.enforcing[h.id] = true;
+        (enforce ? ApiClient.enforceSettings(h.id) : ApiClient.unenforceSettings(h.id)).then(function (file) {
+          EventBus.toast('success', enforce ? 'Settings enforced' : 'Settings withdrawn',
+            file.filename + (enforce ? ' is now enforced on ' : ' is no longer enforced on ') + file.iedName);
+          EventBus.publish(EventBus.EVENTS.SETTINGS_ENFORCEMENT_CHANGED, file);
+          return load();
+        }).catch(function (rej) {
+          var body = rej.data || {};
+          EventBus.toast('error', enforce ? 'Enforce failed' : 'Withdraw failed', (body.details && body.details[0]) || body.message || 'Request failed');
+        }).finally(function () { delete $scope.enforcing[h.id]; });
       };
 
       $scope.goCompare = function () { $state.go('settingsCompare', { id: iedId, left: $scope.compare.left, right: $scope.compare.right }); };

@@ -30,7 +30,7 @@ final class DtoMapper {
             i.getIpAddress(), i.getStatus().name(), i.getInstalledOn(), i.getLastSettingsUploadAt(), i.getLastSeenAt(),
             s.getId(), s.getCode(), s.getName(), b.getId(), b.getName(),
             i.getFirmwareVersion() == null ? null : firmware(i.getFirmwareVersion()),
-            st.activeSettingsVersion(), st.settingsFileCount(), st.recordCount(), st.sclIedName());
+            st.activeSettingsVersion(), st.enforcedSettingsVersions(), st.settingsFileCount(), st.recordCount(), st.sclIedName());
     }
 
     static FirmwareDto firmware(FirmwareVersion f) {
@@ -76,6 +76,7 @@ final class DtoMapper {
     static CurrentUserDto currentUser(CurrentUser u) {
         List<String> perms = new ArrayList<>();
         if (u.role().canUploadSettings()) perms.add("settings:upload");
+        if (u.role().canEnforceSettings()) perms.add("settings:enforce");
         if (u.role().canImportScl()) perms.add("scl:import");
         if (u.role().canAssignFirmware()) perms.add("firmware:assign");
         if (u.role().canDownloadRecords()) perms.add("records:download");

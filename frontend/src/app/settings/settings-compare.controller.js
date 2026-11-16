@@ -119,7 +119,8 @@
         EventBus.toast('info', 'Export', lines.length - 1 + ' rows exported');
       };
 
-      var unsubs = [EventBus.subscribe(EventBus.EVENTS.USER_CHANGED, load), EventBus.subscribe(EventBus.EVENTS.SETTINGS_UPLOADED, load)];
+      var unsubs = [EventBus.subscribe(EventBus.EVENTS.USER_CHANGED, load), EventBus.subscribe(EventBus.EVENTS.SETTINGS_UPLOADED, load),
+        EventBus.subscribe(EventBus.EVENTS.SETTINGS_ENFORCEMENT_CHANGED, load)];
       $scope.$on('$destroy', function () { unsubs.forEach(function (u) { u(); }); });
       load();
     }]);
