@@ -5,6 +5,7 @@ import com.meridian.sam.domain.DeviceType;
 import com.meridian.sam.domain.IedStatus;
 import com.meridian.sam.domain.Ied;
 import com.meridian.sam.service.IedService;
+import com.meridian.sam.service.IedStats;
 import com.meridian.sam.web.dto.FirmwareAssignmentRequest;
 import com.meridian.sam.web.dto.FirmwareDto;
 import com.meridian.sam.web.dto.IedDto;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +31,9 @@ public class IedController {
                                @RequestParam(required = false) DeviceType deviceType,
                                @RequestParam(required = false) IedStatus status,
                                @RequestParam(required = false) String q) {
-        return service.search(substationId, deviceType, status, q).stream().map(this::toDto).toList();
+        List<Ied> ieds = service.search(substationId, deviceType, status, q);
+        Map<Long, IedStats> stats = service.stats(ieds.stream().map(Ied::getId).toList());
+        return ieds.stream().map(i -> DtoMapper.ied(i, stats.get(i.getId()))).toList();
     }
 
     @GetMapping("/ieds/{id}")

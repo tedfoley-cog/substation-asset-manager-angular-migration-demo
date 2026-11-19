@@ -10,10 +10,13 @@ import com.meridian.sam.repository.SclImportRepository;
 import com.meridian.sam.repository.DisturbanceRecordRepository;
 import com.meridian.sam.repository.SettingsFileRepository;
 import com.meridian.sam.domain.SettingsStatus;
-import com.meridian.sam.domain.SettingsFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,12 +34,31 @@ public class IedService {
         this.sclImports = sclImports; this.audit = audit;
     }
 
-    /** Summary figures for one IED. Issued per row (N+1) — the inventory is small today; revisit when it is not. */
+    /** Summary figures for one IED. */
     public IedStats stats(Ied ied) {
-        Integer active = settingsFiles.findFirstByIedIdAndStatus(ied.getId(), SettingsStatus.ACTIVE).map(SettingsFile::getVersionNo).orElse(null);
-        List<String> sclNames = sclImports.matchedSclIedNames(ied.getId());
-        return new IedStats(active, settingsFiles.countByIedId(ied.getId()), records.countByIedId(ied.getId()),
-            sclNames.isEmpty() ? null : sclNames.get(0));
+        return stats(List.of(ied.getId())).get(ied.getId());
+    }
+
+    /** Summary figures for many IEDs in four queries total, keyed by IED id in the order given. */
+    public Map<Long, IedStats> stats(Collection<Long> iedIds) {
+        Map<Long, IedStats> out = new LinkedHashMap<>();
+        if (iedIds.isEmpty()) return out;
+        Map<Long, Integer> active = firstPerIed(settingsFiles.versionNosByIedIdsAndStatus(iedIds, SettingsStatus.ACTIVE));
+        Map<Long, Long> fileCounts = firstPerIed(settingsFiles.countByIedIds(iedIds));
+        Map<Long, Long> recordCounts = firstPerIed(records.countByIedIds(iedIds));
+        Map<Long, String> sclNames = firstPerIed(sclImports.matchedSclIedNamesByIedIds(iedIds));
+        for (Long id : iedIds) {
+            out.put(id, new IedStats(active.get(id), fileCounts.getOrDefault(id, 0L), recordCounts.getOrDefault(id, 0L), sclNames.get(id)));
+        }
+        return out;
+    }
+
+    /** Maps {@code [iedId, value]} rows to iedId -> value, keeping the first row seen per IED. */
+    @SuppressWarnings("unchecked")
+    private static <V> Map<Long, V> firstPerIed(List<Object[]> rows) {
+        Map<Long, V> m = new HashMap<>();
+        for (Object[] row : rows) m.putIfAbsent((Long) row[0], (V) row[1]);
+        return m;
     }
 
     public List<Ied> search(Long substationId, DeviceType deviceType, IedStatus status, String q) {
